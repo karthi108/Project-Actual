@@ -2,7 +2,7 @@
 
 Read README.md and the relevant Phase-0 contract before changing this project. The original user specifications are preserved under docs/reference.
 
-- Phase 0 (`4e06cc6`), Phase 1 (`5b6116a`) and Phase 2 (`fc6d396`) were accepted by the user. Current authorized scope is Phase 3 Persistence only: PostgreSQL, SQLAlchemy and Alembic. Preserve the accepted domain contracts and CareerLab boundaries, run real PostgreSQL acceptance checks and make one focused local commit; do not start Phase 4 without a new request.
+- Phases 0 (`4e06cc6`), 1 (`5b6116a`), 2 (`fc6d396`) and 3 (`d2a7544`) were accepted by the user. Current authorized scope is Phase 4 FastAPI Boundary only. Preserve accepted contracts, persistence/migrations and CareerLab isolation. With authentication excluded, expose only explicitly isolated synthetic development data, derive workspace/actor from server configuration and enforce local request boundaries. Run real PostgreSQL API/regression checks on both supported Python versions and make one focused local commit. Do not start Phase 5 without a new request.
 - CareerLab contains eight public development fixtures. Validation and locked-test data remain unmaterialized. Keep evaluator answers, lineage/category metadata and future outcomes outside observable input files. Never partition these shared-ancestry development fixtures into claimed independent held-out sets.
 - Explain the problem, invariants, simplest solution and important trade-offs for meaningful changes. Keep slices small enough for the user to understand.
 - Create directories and dependencies only when functionality requires them. No speculative frontend, model provider, connector, voice, agent or enterprise scaffold.
