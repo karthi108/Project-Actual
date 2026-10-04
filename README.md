@@ -6,9 +6,9 @@ ACTUAL chooses ordinary software before AI, treats model output as an untrusted 
 
 ## Current milestone
 
-**Phase 1: CareerLab development fixtures.** Phase 0 was accepted by the user at commit `4e06cc6`. CareerLab now supplies eight reproducible synthetic cases, strict fixture contracts, separately packaged evaluator annotations and integrity checks. This is an offline evaluation environment; ACTUAL application behavior remains to be implemented and measured.
+**Phase 2: Core Contracts.** Phase 0 was accepted at `4e06cc6` and Phase 1 CareerLab at `5b6116a`. The current slice adds strict domain records, scoped evidence/claim provenance, career relationships, application histories and six observation events. This is a Python contract layer; ACTUAL application behavior remains to be implemented and measured.
 
-Start with [the engineering contract](docs/phase-0/engineering-contract.md), then [CareerLab usage and file map](docs/phase-1/README.md) and [Phase-1 acceptance evidence](docs/phase-1/acceptance-review.md). The accepted [Phase-1 plan](docs/phase-0/phase-1-plan.md) limits this release to public development data. Validation and locked testing are deferred; Phase 2 requires a new request.
+Start with [the engineering contract](docs/phase-0/engineering-contract.md), then [Core usage](docs/phase-2/README.md), [the design and invariants](docs/phase-2/design.md) and [Phase-2 acceptance evidence](docs/phase-2/acceptance-review.md). The accepted [CareerLab usage](docs/phase-1/README.md) and [Phase-1 evidence](docs/phase-1/acceptance-review.md) remain historical baseline documents. Validation and locked-test datasets remain unmaterialized. Phase 3 requires a new request.
 
 ## Contract map
 
@@ -35,9 +35,14 @@ From this repository, with Python 3.13 or 3.14 and uv available:
 
 ```powershell
 uv sync --locked
-uv run --locked careerlab generate
-uv run --locked careerlab verify
+uv run --locked careerlab generate --manifest datasets/manifests/careerlab-core-env-v1.json
+uv run --offline --locked careerlab verify --manifest datasets/manifests/careerlab-core-env-v1.json
 uv run --locked pytest -q
+uv run --locked ruff check src tests
+uv run --locked ruff format --check src tests
+uv run --locked mypy
 ```
 
-Generation validates eight public cases before writing observable JSON, a separate ignored evaluator directory and a version/hash manifest. The eighth case deliberately contains an invalid transition and is accepted only as a negative fixture with the exact expected rejection reason. Do not give evaluator files or the manifest to a future ACTUAL component. See [the usage guide](docs/phase-1/README.md) for boundaries, checks and reproducibility details.
+Generation validates eight public cases before writing observable JSON, a separate ignored evaluator directory and a version/hash manifest. The eighth case deliberately contains an invalid transition and is accepted only as a negative fixture with the exact expected rejection reason. Do not give evaluator files or manifests to a future evaluated ACTUAL component.
+
+Always select the current environment manifest explicitly: adding the Core dependency changed project/lockfile hashes. The original `careerlab-dev-v1.json` remains the accepted Phase-1 baseline; the unchanged CLI default still points to it. The new manifest preserves all input/oracle record hashes and records the current environment separately.

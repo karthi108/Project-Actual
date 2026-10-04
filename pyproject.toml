@@ -1,9 +1,9 @@
 [project]
 name = "actual-careerlab"
 version = "0.1.0"
-description = "Offline synthetic CareerLab fixtures and integrity checks for ACTUAL Phase 1"
+description = "ACTUAL core domain contracts and offline CareerLab integrity checks"
 requires-python = ">=3.13,<3.15"
-dependencies = []
+dependencies = ["pydantic==2.13.5"]
 
 [build-system]
 requires = ["setuptools==84.0.0"]
@@ -19,7 +19,7 @@ careerlab = "actual.careerlab.__main__:main"
 dev = ["pytest==9.1.1", "ruff==0.16.10", "mypy==2.4.0"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests/careerlab"]
+testpaths = ["tests/careerlab", "tests/core"]
 pythonpath = ["src"]
 addopts = "-ra --strict-config --strict-markers --basetemp=.pytest-tmp-careerlab"
 

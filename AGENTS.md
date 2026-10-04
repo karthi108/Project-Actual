@@ -2,7 +2,7 @@
 
 Read README.md and the relevant Phase-0 contract before changing this project. The original user specifications are preserved under docs/reference.
 
-- Phase 0 was accepted by the user at commit `4e06cc6`. Current authorized scope is Phase 1 CareerLab only, under the accepted Phase-0 contract and Phase-1 plan. Stop after its acceptance gates and focused local commit; do not start Phase 2 without a new user request.
+- Phase 0 (`4e06cc6`) and Phase 1 (`5b6116a`) were accepted by the user. Current authorized scope is Phase 2 Core Contracts only. Implement the smallest used domain contracts, run their acceptance checks and make one focused local commit; do not start Phase 3 without a new request.
 - CareerLab contains eight public development fixtures. Validation and locked-test data remain unmaterialized. Keep evaluator answers, lineage/category metadata and future outcomes outside observable input files. Never partition these shared-ancestry development fixtures into claimed independent held-out sets.
 - Explain the problem, invariants, simplest solution and important trade-offs for meaningful changes. Keep slices small enough for the user to understand.
 - Create directories and dependencies only when functionality requires them. No speculative frontend, model provider, connector, voice, agent or enterprise scaffold.
