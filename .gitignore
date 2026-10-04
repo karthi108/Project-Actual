@@ -1,0 +1,38 @@
+# Secrets and private runtime data
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem
+*.key
+/private/
+/local-data/
+/storage/
+/backups/
+/models/
+*.db
+*.sqlite
+*.sqlite3
+*.log
+
+# Generated evaluation inputs and withheld labels; commit manifests/hashes only.
+/datasets/locked_test/
+/datasets/ground_truth/
+/evaluation-runs/
+
+# Language and tool outputs, as those tools are introduced
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+node_modules/
+.next/
+dist/
+build/
+*.egg-info/
+.DS_Store
+Thumbs.db
