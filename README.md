@@ -6,9 +6,9 @@ ACTUAL chooses ordinary software before AI, treats model output as an untrusted 
 
 ## Current milestone
 
-**Phase 4: FastAPI Boundary.** Accepted milestones are Phase 0 `4e06cc6`, Phase 1 CareerLab `5b6116a`, Phase 2 Core Contracts `fc6d396` and Phase 3 Persistence `d2a7544`. This slice exposes manual Career commands and reads through a typed, versioned HTTP boundary, an application layer and the accepted transactional PostgreSQL repository. It runs only in explicitly isolated synthetic development mode; real-data access requires later local-owner access controls. The complete Career assistant remains to be implemented and measured.
+**Phase 5: Local Qwen Model Gateway.** Accepted milestones are Phase 0 `4e06cc6`, Phase 1 CareerLab `5b6116a`, Phase 2 Core Contracts `fc6d396`, Phase 3 Persistence `d2a7544` and Phase 4 FastAPI Boundary `7deff65`. This slice adds a provider-independent gateway, one local Ollama/Qwen adapter and a neutral structured probe. Validated output remains an untrusted proposal. No Career intelligence, model tools or real-data path is enabled; the complete Career assistant remains to be implemented and measured.
 
-Start with [the engineering contract](docs/phase-0/engineering-contract.md), then [API usage](docs/phase-4/README.md), [the boundary design](docs/phase-4/design.md), [ADR 0005](docs/adr/0005-fastapi-boundary.md) and [Phase-4 acceptance evidence](docs/phase-4/acceptance-review.md). Accepted [Persistence usage](docs/phase-3/README.md), [storage invariants](docs/phase-3/design.md), [Phase-3 evidence](docs/phase-3/acceptance-review.md), [Core usage](docs/phase-2/README.md), [Phase-2 evidence](docs/phase-2/acceptance-review.md), [CareerLab usage](docs/phase-1/README.md) and [Phase-1 evidence](docs/phase-1/acceptance-review.md) remain historical baselines. Validation and locked-test datasets remain unmaterialized. Do not begin Phase 5 without a new request.
+Start with [the engineering contract](docs/phase-0/engineering-contract.md), then [Model Gateway usage](docs/phase-5/README.md), [the model boundary design](docs/phase-5/design.md), [ADR 0006](docs/adr/0006-local-model-gateway.md) and [Phase-5 acceptance evidence](docs/phase-5/acceptance-review.md). Accepted [API usage](docs/phase-4/README.md), [Phase-4 evidence](docs/phase-4/acceptance-review.md), [Persistence usage](docs/phase-3/README.md), [storage invariants](docs/phase-3/design.md), [Phase-3 evidence](docs/phase-3/acceptance-review.md), [Core usage](docs/phase-2/README.md), [Phase-2 evidence](docs/phase-2/acceptance-review.md), [CareerLab usage](docs/phase-1/README.md) and [Phase-1 evidence](docs/phase-1/acceptance-review.md) remain historical baselines. Validation and locked-test datasets remain unmaterialized. Do not begin Phase 6 without a new request.
 
 ## Contract map
 
@@ -35,15 +35,24 @@ From this repository, with Python 3.13 or 3.14 and uv available:
 
 ```powershell
 uv sync --locked
-./scripts/verify_phase4.ps1
-uv run --locked careerlab generate --manifest datasets/manifests/careerlab-api-env-v1.json
-uv run --offline --locked careerlab verify --manifest datasets/manifests/careerlab-api-env-v1.json
+./scripts/verify_phase5.ps1
+uv run --locked careerlab generate --manifest datasets/manifests/careerlab-model-env-v1.json
+uv run --offline --locked careerlab verify --manifest datasets/manifests/careerlab-model-env-v1.json
 ```
 
 Generation validates eight public cases before writing observable JSON, a separate ignored evaluator directory and a version/hash manifest. The eighth case deliberately contains an invalid transition and is accepted only as a negative fixture with the exact expected rejection reason. Do not give evaluator files or manifests to a future evaluated ACTUAL component.
 
-The Phase-4 verification script reuses the accepted disposable-PostgreSQL harness with current testpaths and dependencies. It requires Docker and installed Python 3.13/3.14 paths, runs the complete checks and removes only its own disposable database. See [Persistence usage](docs/phase-3/README.md) for interpreter overrides, manual test configuration, migration commands and storage/privacy limits. PostgreSQL acceptance tests require an explicit disposable database and do not silently skip.
+The Phase-5 verification script reuses the accepted disposable-PostgreSQL harness with current testpaths and dependencies. It requires Docker and installed Python 3.13/3.14 paths, runs the complete deterministic checks and removes only its own disposable database. It does not run a large model. See [Persistence usage](docs/phase-3/README.md) for interpreter overrides, manual test configuration, migration commands and storage/privacy limits. PostgreSQL acceptance tests require an explicit disposable database and do not silently skip.
 
-See [API usage](docs/phase-4/README.md#start-an-isolated-synthetic-development-api) for private database configuration and the loopback-only `actual-api` launcher. The API does not migrate at startup. It enforces server-configured workspace/actor scope, synthetic classifications, bounded JSON, safe error envelopes and request metadata logs. These restrictions do not authenticate local callers or detect real prose mislabeled synthetic. Claims remain self-reported and attached evidence unreviewed; no AI, external submission, frontend, connectors or workflow execution is included.
+The separate live acceptance helper uses the installed `qwen3:4b-instruct` by default. It starts and stops its own temporary loopback Ollama process, with cloud/body logging/pruning disabled and existing model weights; it does not change the shared server configuration or download models:
 
-Always select the current environment manifest explicitly: API dependencies changed project/lockfile hashes. The three earlier manifests remain accepted historical baselines; the unchanged CLI default still points to the Phase-1 manifest. The new manifest preserves all input/oracle record hashes and records the current environment separately. No evaluator record is part of a runtime domain snapshot, storage table or API response.
+```powershell
+$env:ACTUAL_MODEL_MODE = 'synthetic-development'
+uv run --locked python scripts/verify_phase5_live.py
+```
+
+The direct `actual-model-probe` command uses the configured local server and refuses inference unless cloud-disabled status is confirmed. Supported Ollama compatibility is explicitly 0.34.3; future versions require review. No paid model service, API key, arbitrary prompt argument or HTTP AI endpoint is required. The probe admits only fabricated enum tokens; it has no CareerLab/evaluator input mapping. See [Model Gateway usage](docs/phase-5/README.md) for configuration and limits.
+
+See [API usage](docs/phase-4/README.md#start-an-isolated-synthetic-development-api) for private database configuration and the loopback-only `actual-api` launcher. Its accepted behavior remains unchanged: no startup migrations, server-configured workspace/actor scope, synthetic classifications, bounded JSON, safe errors and request metadata logs. These restrictions do not authenticate local callers or detect real prose mislabeled synthetic. Claims remain self-reported and evidence unreviewed. Phase 5 adds no model integration to those routes, external submission, frontend, connectors or workflow execution.
+
+Always select the current environment manifest explicitly: gateway configuration and HTTPX2 promotion to runtime changed project/lockfile hashes. The four earlier manifests remain accepted historical baselines; the unchanged CLI default still points to the Phase-1 manifest. The new manifest preserves all input/oracle record hashes and records the current environment separately. No evaluator record is part of a runtime domain snapshot, storage table, API response or model request.
