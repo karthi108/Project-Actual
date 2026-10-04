@@ -6,9 +6,9 @@ ACTUAL chooses ordinary software before AI, treats model output as an untrusted 
 
 ## Current milestone
 
-**Phase 0: engineering contract, documentation only.** No application, model runtime, database, connector or agent has been implemented. The contract is ready for review; its runtime guarantees remain to be demonstrated in later phases.
+**Phase 1: CareerLab development fixtures.** Phase 0 was accepted by the user at commit `4e06cc6`. CareerLab now supplies eight reproducible synthetic cases, strict fixture contracts, separately packaged evaluator annotations and integrity checks. This is an offline evaluation environment; ACTUAL application behavior remains to be implemented and measured.
 
-Start with [the engineering contract](docs/phase-0/engineering-contract.md), then [the acceptance review](docs/phase-0/acceptance-review.md). The next bounded task is [Phase 1: CareerLab](docs/phase-0/phase-1-plan.md).
+Start with [the engineering contract](docs/phase-0/engineering-contract.md), then [CareerLab usage and file map](docs/phase-1/README.md) and [Phase-1 acceptance evidence](docs/phase-1/acceptance-review.md). The accepted [Phase-1 plan](docs/phase-0/phase-1-plan.md) limits this release to public development data. Validation and locked testing are deferred; Phase 2 requires a new request.
 
 ## Contract map
 
@@ -31,4 +31,13 @@ Build one understandable slice per phase. Define invariants, explain the design,
 
 The first product release is single-user and runs on the user's computer. It supports manual job intake, evidence-backed fit/gap analysis, CV recommendations, reviewed draft improvements and manually recorded application status. The user submits outside ACTUAL.
 
-There are no installation or run commands yet because there is no application to run.
+From this repository, with Python 3.13 or 3.14 and uv available:
+
+```powershell
+uv sync --locked
+uv run --locked careerlab generate
+uv run --locked careerlab verify
+uv run --locked pytest -q
+```
+
+Generation validates eight public cases before writing observable JSON, a separate ignored evaluator directory and a version/hash manifest. The eighth case deliberately contains an invalid transition and is accepted only as a negative fixture with the exact expected rejection reason. Do not give evaluator files or the manifest to a future ACTUAL component. See [the usage guide](docs/phase-1/README.md) for boundaries, checks and reproducibility details.

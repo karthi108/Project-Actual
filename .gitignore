@@ -15,7 +15,7 @@
 *.sqlite3
 *.log
 
-# Generated evaluation inputs and withheld labels; commit manifests/hashes only.
+# Locked inputs and generated evaluator labels; public development inputs are versioned.
 /datasets/locked_test/
 /datasets/ground_truth/
 /evaluation-runs/
@@ -25,6 +25,7 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+/.pytest-tmp-careerlab*/
 .mypy_cache/
 .ruff_cache/
 .coverage
