@@ -6,9 +6,9 @@ ACTUAL chooses ordinary software before AI, treats model output as an untrusted 
 
 ## Current milestone
 
-**Phase 2: Core Contracts.** Phase 0 was accepted at `4e06cc6` and Phase 1 CareerLab at `5b6116a`. The current slice adds strict domain records, scoped evidence/claim provenance, career relationships, application histories and six observation events. This is a Python contract layer; ACTUAL application behavior remains to be implemented and measured.
+**Phase 3: Persistence.** Phase 0 was accepted at `4e06cc6`, Phase 1 CareerLab at `5b6116a` and Phase 2 Core Contracts at `fc6d396`. The current slice adds local PostgreSQL storage, frozen Alembic migrations, exact domain round trips, transactional state/observations and explicit retention/deletion primitives. ACTUAL application behavior remains to be implemented and measured.
 
-Start with [the engineering contract](docs/phase-0/engineering-contract.md), then [Core usage](docs/phase-2/README.md), [the design and invariants](docs/phase-2/design.md) and [Phase-2 acceptance evidence](docs/phase-2/acceptance-review.md). The accepted [CareerLab usage](docs/phase-1/README.md) and [Phase-1 evidence](docs/phase-1/acceptance-review.md) remain historical baseline documents. Validation and locked-test datasets remain unmaterialized. Phase 3 requires a new request.
+Start with [the engineering contract](docs/phase-0/engineering-contract.md), then [Persistence usage](docs/phase-3/README.md), [the storage invariants](docs/phase-3/design.md) and [Phase-3 acceptance evidence](docs/phase-3/acceptance-review.md). The accepted [Core usage](docs/phase-2/README.md), [Phase-2 evidence](docs/phase-2/acceptance-review.md), [CareerLab usage](docs/phase-1/README.md) and [Phase-1 evidence](docs/phase-1/acceptance-review.md) remain historical baselines. Validation and locked-test datasets remain unmaterialized. Do not begin Phase 4 without a new request.
 
 ## Contract map
 
@@ -35,14 +35,13 @@ From this repository, with Python 3.13 or 3.14 and uv available:
 
 ```powershell
 uv sync --locked
-uv run --locked careerlab generate --manifest datasets/manifests/careerlab-core-env-v1.json
-uv run --offline --locked careerlab verify --manifest datasets/manifests/careerlab-core-env-v1.json
-uv run --locked pytest -q
-uv run --locked ruff check src tests
-uv run --locked ruff format --check src tests
-uv run --locked mypy
+./scripts/verify_phase3.ps1
+uv run --locked careerlab generate --manifest datasets/manifests/careerlab-persistence-env-v1.json
+uv run --offline --locked careerlab verify --manifest datasets/manifests/careerlab-persistence-env-v1.json
 ```
 
 Generation validates eight public cases before writing observable JSON, a separate ignored evaluator directory and a version/hash manifest. The eighth case deliberately contains an invalid transition and is accepted only as a negative fixture with the exact expected rejection reason. Do not give evaluator files or manifests to a future evaluated ACTUAL component.
 
-Always select the current environment manifest explicitly: adding the Core dependency changed project/lockfile hashes. The original `careerlab-dev-v1.json` remains the accepted Phase-1 baseline; the unchanged CLI default still points to it. The new manifest preserves all input/oracle record hashes and records the current environment separately.
+The verification script requires Docker and installed Python 3.13/3.14 paths. It starts isolated real PostgreSQL, runs the complete checks and removes only its own disposable database. See [Persistence usage](docs/phase-3/README.md) for interpreter overrides, manual test configuration, migration commands and storage/privacy limits. PostgreSQL acceptance tests require an explicit disposable database and do not silently skip.
+
+Always select the current environment manifest explicitly: persistence dependencies changed project/lockfile hashes. The original `careerlab-dev-v1.json` and `careerlab-core-env-v1.json` remain the accepted historical baselines; the unchanged CLI default still points to the Phase-1 manifest. The new manifest preserves all input/oracle record hashes and records the current environment separately. No evaluator record is part of a runtime domain snapshot or storage table.

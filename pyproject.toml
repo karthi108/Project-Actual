@@ -1,9 +1,14 @@
 [project]
 name = "actual-careerlab"
 version = "0.1.0"
-description = "ACTUAL core domain contracts and offline CareerLab integrity checks"
+description = "ACTUAL domain contracts, PostgreSQL persistence and offline CareerLab checks"
 requires-python = ">=3.13,<3.15"
-dependencies = ["pydantic==2.13.5"]
+dependencies = [
+    "pydantic==2.13.5",
+    "SQLAlchemy==2.1.3",
+    "alembic==1.20.0",
+    "psycopg[binary]==3.3.6",
+]
 
 [build-system]
 requires = ["setuptools==84.0.0"]
@@ -19,7 +24,7 @@ careerlab = "actual.careerlab.__main__:main"
 dev = ["pytest==9.1.1", "ruff==0.16.10", "mypy==2.4.0"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests/careerlab", "tests/core"]
+testpaths = ["tests/careerlab", "tests/core", "tests/persistence"]
 pythonpath = ["src"]
 addopts = "-ra --strict-config --strict-markers --basetemp=.pytest-tmp-careerlab"
 
@@ -34,4 +39,4 @@ select = ["E", "F", "I", "UP", "B"]
 python_version = "3.13"
 mypy_path = "src"
 strict = true
-files = ["src"]
+files = ["src", "migrations"]
