@@ -1,0 +1,238 @@
+{
+  "schema_version": "actual-phase6a-safety-oracles-v1",
+  "synthetic": true,
+  "cases": [
+    {
+      "id": "P6A-SAFE-001",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-002",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-003",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-004",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-005",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-006",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-007",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-008",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-009",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-010",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-011",
+      "canonical_concept": "french",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-012",
+      "canonical_concept": "french",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-013",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-014",
+      "canonical_concept": null,
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "preferred",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-015",
+      "canonical_concept": null,
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-016",
+      "canonical_concept": "python",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-017",
+      "canonical_concept": "french",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-018",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "ambiguous",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-019",
+      "canonical_concept": "python",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-020",
+      "canonical_concept": "experience",
+      "resolution": "abstained",
+      "assertion": null,
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-021",
+      "canonical_concept": "experience",
+      "resolution": "resolved",
+      "assertion": {
+        "kind": "experience",
+        "unit": "months",
+        "value": 60
+      },
+      "priority": "essential",
+      "status": "gap",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-022",
+      "canonical_concept": "experience",
+      "resolution": "resolved",
+      "assertion": {
+        "kind": "experience",
+        "unit": "months",
+        "value": 60
+      },
+      "priority": "essential",
+      "status": "gap",
+      "declared_shortfall": false
+    },
+    {
+      "id": "P6A-SAFE-023",
+      "canonical_concept": "french",
+      "resolution": "resolved",
+      "assertion": {
+        "kind": "language",
+        "unit": "cefr_level",
+        "value": 4
+      },
+      "priority": "essential",
+      "status": "unknown",
+      "declared_shortfall": true
+    },
+    {
+      "id": "P6A-SAFE-024",
+      "canonical_concept": "python",
+      "resolution": "resolved",
+      "assertion": {
+        "kind": "skill",
+        "unit": "skill_level",
+        "value": 2
+      },
+      "priority": "essential",
+      "status": "supported",
+      "declared_shortfall": false
+    }
+  ]
+}

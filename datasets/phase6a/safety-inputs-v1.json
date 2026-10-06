@@ -1,0 +1,126 @@
+{
+  "schema_version": "actual-phase6a-safety-inputs-v1",
+  "synthetic": true,
+  "cases": [
+    {
+      "id": "P6A-SAFE-001",
+      "text": "5.5 years of experience are required.",
+      "term": "experience"
+    },
+    {
+      "id": "P6A-SAFE-002",
+      "text": "Over five years of experience are required.",
+      "term": "experience"
+    },
+    {
+      "id": "P6A-SAFE-003",
+      "text": "Five years of security experience are required.",
+      "term": "experience"
+    },
+    {
+      "id": "P6A-SAFE-004",
+      "text": "Five years of professional experience are required.",
+      "term": "professional experience"
+    },
+    {
+      "id": "P6A-SAFE-005",
+      "text": "Six months of internship experience are required.",
+      "term": "internship experience"
+    },
+    {
+      "id": "P6A-SAFE-006",
+      "text": "Two years of personal project experience are required.",
+      "term": "personal project experience"
+    },
+    {
+      "id": "P6A-SAFE-007",
+      "text": "Three years of academic experience are required.",
+      "term": "academic experience"
+    },
+    {
+      "id": "P6A-SAFE-008",
+      "text": "Two years of open-source experience are required.",
+      "term": "open-source experience"
+    },
+    {
+      "id": "P6A-SAFE-009",
+      "text": "Six months of internship experience and two years of personal project experience are required.",
+      "term": "internship experience"
+    },
+    {
+      "id": "P6A-SAFE-010",
+      "text": "Several years of experience are required.",
+      "term": "experience"
+    },
+    {
+      "id": "P6A-SAFE-011",
+      "text": "Professional French is required.",
+      "term": "French"
+    },
+    {
+      "id": "P6A-SAFE-012",
+      "text": "Fluent French is required.",
+      "term": "French"
+    },
+    {
+      "id": "P6A-SAFE-013",
+      "text": "Cloud experience is required.",
+      "term": "experience"
+    },
+    {
+      "id": "P6A-SAFE-014",
+      "text": "AWS certification is preferred.",
+      "term": "AWS certification"
+    },
+    {
+      "id": "P6A-SAFE-015",
+      "text": "Docker is required.",
+      "term": "Docker"
+    },
+    {
+      "id": "P6A-SAFE-016",
+      "text": "Strong communication and Python are required.",
+      "term": "Python"
+    },
+    {
+      "id": "P6A-SAFE-017",
+      "text": "French B1 or B2 is required.",
+      "term": "French"
+    },
+    {
+      "id": "P6A-SAFE-018",
+      "text": "Five years of experience are not required.",
+      "term": "experience"
+    },
+    {
+      "id": "P6A-SAFE-019",
+      "text": "Strong Python 3 is essential.",
+      "term": "Python"
+    },
+    {
+      "id": "P6A-SAFE-020",
+      "text": "Five to seven years of experience are required.",
+      "term": "experience"
+    },
+    {
+      "id": "P6A-SAFE-021",
+      "text": "Five years of experience are essential.",
+      "term": "experience"
+    },
+    {
+      "id": "P6A-SAFE-022",
+      "text": "Five years of backend experience are essential.",
+      "term": "backend experience"
+    },
+    {
+      "id": "P6A-SAFE-023",
+      "text": "French B2 is required.",
+      "term": "French"
+    },
+    {
+      "id": "P6A-SAFE-024",
+      "text": "Python at working level is required.",
+      "term": "Python"
+    }
+  ]
+}

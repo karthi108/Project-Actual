@@ -1,0 +1,73 @@
+{
+  "careerlab_benchmark_units": false,
+  "frozen_rules_changed": false,
+  "model_invoked": false,
+  "probes": [
+    {
+      "expected_semantic_limitation": "The duration expression matches trailing 5 years and loses the decimal. Under the explicit 12-month/year convention, 5.5 years is 66 months. Sixty months does not satisfy it. Fractional duration should remain unresolved until a deliberate rule supports it.",
+      "id": "fractional_duration",
+      "job_text": "5.5 years of experience are required.",
+      "observed_fit_for_reviewed_generic_60_month_evidence": "supported",
+      "observed_normalized_assertion": {
+        "kind": "experience",
+        "schema_version": "actual-core-v1",
+        "subject": "experience",
+        "unit": "months",
+        "value": 60
+      },
+      "priority": "essential",
+      "quote": "5.5 years of experience are required.",
+      "term": "experience"
+    },
+    {
+      "expected_semantic_limitation": "The strict greater-than qualifier is lost. At least 60 months is not equivalent to over five years. Preserve unresolved meaning until strict duration comparison is supported.",
+      "id": "strict_duration_inequality",
+      "job_text": "Over five years of experience are required.",
+      "observed_fit_for_reviewed_generic_60_month_evidence": "supported",
+      "observed_normalized_assertion": {
+        "kind": "experience",
+        "schema_version": "actual-core-v1",
+        "subject": "experience",
+        "unit": "months",
+        "value": 60
+      },
+      "priority": "essential",
+      "quote": "Over five years of experience are required.",
+      "term": "experience"
+    },
+    {
+      "expected_semantic_limitation": "The security-specific duration scope is lost. Reviewed generic experience does not establish security experience. Preserve unresolved scope until contracts and evidence can represent and support it.",
+      "id": "experience_subject_scope",
+      "job_text": "Five years of security experience are required.",
+      "observed_fit_for_reviewed_generic_60_month_evidence": "supported",
+      "observed_normalized_assertion": {
+        "kind": "experience",
+        "schema_version": "actual-core-v1",
+        "subject": "experience",
+        "unit": "months",
+        "value": 60
+      },
+      "priority": "essential",
+      "quote": "Five years of security experience are required.",
+      "term": "experience"
+    }
+  ],
+  "reproduction": {
+    "command": "uv run --offline --locked python -",
+    "python_stdin": "import sys\nfrom pathlib import Path\nsys.path.insert(0,str(Path('tests/intelligence').resolve()))\nfrom test_evidence_matching import source_job, candidate, assessed\nfrom actual.job_intelligence.normalize import normalize_requirement\nfor text in ('5.5 years of experience are required.', 'Over five years of experience are required.', 'Five years of security experience are required.'):\n    job=source_job(text)\n    requirement=normalize_requirement(job,quote=text,term='experience',priority='essential')\n    result=assessed(job,candidate(60,kind='experience',subject='experience',unit='months'),'experience')\n    print({'quote':text,'assertion':requirement.assertion.model_dump(mode='json'),'fit':result.rows[0].status})\n"
+  },
+  "review_kind": "independent deterministic code-review probes",
+  "schema_version": "actual-phase6-normalization-review-v1",
+  "scope": "Additional NO-GO and next-iteration limitation evidence outside the pinned runtime development catalog. These are purpose-built synthetic probes, not CareerLab labels, Qwen outputs or added benchmark cases.",
+  "source": {
+    "freeze_document": "docs/phase-6/evaluation-freeze-v1.json",
+    "normalized_lf_sha256": "fcbdc2295e2a1ce308405f923450e08ba47510a5d3dbf1fc89127cfa5e559265",
+    "path": "src/actual/job_intelligence/normalize.py",
+    "relevant_lines": {
+      "duration_regex": 57,
+      "experience_scope": 209,
+      "month_conversion": 230
+    }
+  },
+  "synthetic": true
+}

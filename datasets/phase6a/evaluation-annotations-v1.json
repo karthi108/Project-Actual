@@ -1,0 +1,269 @@
+{
+  "cases": [
+    {
+      "case_id": "CAREER-DEV-001",
+      "source_text_sha256": "eb4e6fcc0b3ff22a618a2e41ef15da74fdd477c7568114a9da08739f5453b9ef",
+      "units": [
+        {
+          "head_end": 25,
+          "head_start": 19,
+          "requirement_id": "CAREER-DEV-001:requirement:1-python",
+          "source_end": 56,
+          "source_start": 19
+        },
+        {
+          "head_end": 64,
+          "head_start": 57,
+          "requirement_id": "CAREER-DEV-001:requirement:1-fastapi",
+          "source_end": 95,
+          "source_start": 57
+        },
+        {
+          "head_end": 108,
+          "head_start": 103,
+          "requirement_id": "CAREER-DEV-001:requirement:1-azure",
+          "source_end": 122,
+          "source_start": 96
+        },
+        {
+          "head_end": 129,
+          "head_start": 123,
+          "requirement_id": "CAREER-DEV-001:requirement:1-french",
+          "source_end": 146,
+          "source_start": 123
+        },
+        {
+          "head_end": 179,
+          "head_start": 169,
+          "requirement_id": "CAREER-DEV-001:requirement:1-experience",
+          "source_end": 194,
+          "source_start": 147
+        },
+        {
+          "head_end": 216,
+          "head_start": 195,
+          "requirement_id": "CAREER-DEV-001:requirement:1-llm_integration",
+          "source_end": 247,
+          "source_start": 195
+        }
+      ]
+    },
+    {
+      "case_id": "CAREER-DEV-002",
+      "source_text_sha256": "eb4e6fcc0b3ff22a618a2e41ef15da74fdd477c7568114a9da08739f5453b9ef",
+      "units": [
+        {
+          "head_end": 25,
+          "head_start": 19,
+          "requirement_id": "CAREER-DEV-002:requirement:1-python",
+          "source_end": 56,
+          "source_start": 19
+        },
+        {
+          "head_end": 64,
+          "head_start": 57,
+          "requirement_id": "CAREER-DEV-002:requirement:1-fastapi",
+          "source_end": 95,
+          "source_start": 57
+        },
+        {
+          "head_end": 108,
+          "head_start": 103,
+          "requirement_id": "CAREER-DEV-002:requirement:1-azure",
+          "source_end": 122,
+          "source_start": 96
+        },
+        {
+          "head_end": 129,
+          "head_start": 123,
+          "requirement_id": "CAREER-DEV-002:requirement:1-french",
+          "source_end": 146,
+          "source_start": 123
+        },
+        {
+          "head_end": 179,
+          "head_start": 169,
+          "requirement_id": "CAREER-DEV-002:requirement:1-experience",
+          "source_end": 194,
+          "source_start": 147
+        },
+        {
+          "head_end": 216,
+          "head_start": 195,
+          "requirement_id": "CAREER-DEV-002:requirement:1-llm_integration",
+          "source_end": 247,
+          "source_start": 195
+        }
+      ]
+    },
+    {
+      "case_id": "CAREER-DEV-003",
+      "source_text_sha256": "607b3a9a017d015f35317edf8280e6f8ca82a6c356b51054e36b973f318262dd",
+      "units": [
+        {
+          "head_end": 25,
+          "head_start": 19,
+          "requirement_id": "CAREER-DEV-003:requirement:1-python",
+          "source_end": 56,
+          "source_start": 19
+        },
+        {
+          "head_end": 64,
+          "head_start": 57,
+          "requirement_id": "CAREER-DEV-003:requirement:1-fastapi",
+          "source_end": 95,
+          "source_start": 57
+        }
+      ]
+    },
+    {
+      "case_id": "CAREER-DEV-004",
+      "source_text_sha256": "ae57552ffb4a95ffd78a66d119c0a3a06563d6e0e9b1367acad65084746985b4",
+      "units": [
+        {
+          "head_end": 25,
+          "head_start": 19,
+          "requirement_id": "CAREER-DEV-004:requirement:1-python",
+          "source_end": 56,
+          "source_start": 19
+        },
+        {
+          "head_end": 78,
+          "head_start": 57,
+          "requirement_id": "CAREER-DEV-004:requirement:1-llm_integration",
+          "source_end": 109,
+          "source_start": 57
+        }
+      ]
+    },
+    {
+      "case_id": "CAREER-DEV-005",
+      "source_text_sha256": "5947bf425768498a24ff79185d0e4d4afa5cac82fbc5d81ccbf0a744deda232b",
+      "units": [
+        {
+          "head_end": 25,
+          "head_start": 19,
+          "requirement_id": "CAREER-DEV-005:requirement:1-python",
+          "source_end": 56,
+          "source_start": 19
+        },
+        {
+          "head_end": 64,
+          "head_start": 57,
+          "requirement_id": "CAREER-DEV-005:requirement:1-fastapi",
+          "source_end": 95,
+          "source_start": 57
+        },
+        {
+          "head_end": 117,
+          "head_start": 96,
+          "requirement_id": "CAREER-DEV-005:requirement:1-llm_integration",
+          "source_end": 148,
+          "source_start": 96
+        },
+        {
+          "head_end": 155,
+          "head_start": 149,
+          "requirement_id": "CAREER-DEV-005:requirement:1-french",
+          "source_end": 172,
+          "source_start": 149
+        }
+      ]
+    },
+    {
+      "case_id": "CAREER-DEV-006",
+      "source_text_sha256": "a1172f08d961926fbc67726bf19a3a182c4a0d6fa3e7c4d1dbf510002f330ad9",
+      "units": [
+        {
+          "head_end": 25,
+          "head_start": 19,
+          "requirement_id": "CAREER-DEV-006:requirement:1-python",
+          "source_end": 56,
+          "source_start": 19
+        },
+        {
+          "head_end": 69,
+          "head_start": 64,
+          "requirement_id": "CAREER-DEV-006:requirement:1-azure",
+          "source_end": 126,
+          "source_start": 57
+        }
+      ]
+    },
+    {
+      "case_id": "CAREER-DEV-007",
+      "source_text_sha256": "59721c381d8e097797aa75a6f03fcdc4e073cd61acf4c6184d3b3bacdb286267",
+      "units": [
+        {
+          "head_end": 25,
+          "head_start": 19,
+          "requirement_id": "CAREER-DEV-007:requirement:1-python",
+          "source_end": 56,
+          "source_start": 19
+        },
+        {
+          "head_end": 64,
+          "head_start": 57,
+          "requirement_id": "CAREER-DEV-007:requirement:1-fastapi",
+          "source_end": 95,
+          "source_start": 57
+        }
+      ]
+    },
+    {
+      "case_id": "P6-ADV-001",
+      "source_text_sha256": "ccbc99dd77c9b95fc1132ba9850630773bde7070fcecb30eb3b818b548c03574",
+      "units": [
+        {
+          "head_end": 25,
+          "head_start": 19,
+          "requirement_id": "P6-ADV-001:requirement:1",
+          "source_end": 56,
+          "source_start": 19
+        }
+      ]
+    },
+    {
+      "case_id": "P6-ADV-002",
+      "source_text_sha256": "08912936968feef36de4645844066d921874ce195cee42a11db4ac37167cca18",
+      "units": [
+        {
+          "head_end": 25,
+          "head_start": 19,
+          "requirement_id": "P6-ADV-002:requirement:1",
+          "source_end": 56,
+          "source_start": 19
+        }
+      ]
+    },
+    {
+      "case_id": "P6-ADV-003",
+      "source_text_sha256": "3b42402db18af647b12aaf48cad8105ca6f1661d24fc529f702a57df5a6e4ce7",
+      "units": [
+        {
+          "head_end": 25,
+          "head_start": 19,
+          "requirement_id": "P6-ADV-003:requirement:1",
+          "source_end": 56,
+          "source_start": 19
+        }
+      ]
+    },
+    {
+      "case_id": "P6-ADV-004",
+      "source_text_sha256": "62c506edc5bdf3821ad92a262548633ac5bb7703f55d4eef4dad148a23eee75d",
+      "units": [
+        {
+          "head_end": 25,
+          "head_start": 19,
+          "requirement_id": "P6-ADV-004:requirement:1",
+          "source_end": 56,
+          "source_start": 19
+        }
+      ]
+    }
+  ],
+  "schema_version": "actual-phase6a-evaluation-source-annotations-v1",
+  "split": "public-development-only",
+  "synthetic": true
+}

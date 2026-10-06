@@ -11,3 +11,13 @@
 # Preserve the original user attachments byte-for-byte, including line endings.
 docs/reference/actual-master-specification.md -text
 docs/reference/actual-local-first-supplement.md -text
+# Reproduce the literal bytes bound by the Phase-6A evaluation freeze.
+# Frozen evaluator artifacts retain CRLF bytes; check whitespace with CR terminators.
+datasets/phase6a/evaluation-annotations-v1.json -text whitespace=trailing-space,space-before-tab,cr-at-eol
+datasets/phase6a/safety-oracles-v1.json -text whitespace=trailing-space,space-before-tab,cr-at-eol
+docs/phase-6a/failure-decomposition-v1.json -text whitespace=trailing-space,space-before-tab,cr-at-eol
+# These evaluated sources had CRLF working copies; Git blobs still use LF.
+src/actual/career/assessments.py text eol=crlf
+src/actual/career/requirements.py text eol=crlf
+src/actual/job_intelligence/normalize.py text eol=crlf
+src/actual/profile/__init__.py text eol=crlf

@@ -1,0 +1,399 @@
+{
+  "base_profile_scenario": "CAREER-DEV-001",
+  "cases": [
+    {
+      "id": "P6A-ADV-A01",
+      "kind": "adversarial",
+      "requirements": [
+        {
+          "expected_normalization": "resolved",
+          "head": "Python",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "essential",
+          "source_quote": "Python at working level is essential.",
+          "status": "supported",
+          "subject": "python",
+          "unit": "skill_level"
+        },
+        {
+          "expected_normalization": "resolved",
+          "head": "FastAPI",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "preferred",
+          "source_quote": "FastAPI at working level is preferred.",
+          "status": "supported",
+          "subject": "fastapi",
+          "unit": "skill_level"
+        }
+      ]
+    },
+    {
+      "id": "P6A-ADV-A02",
+      "kind": "adversarial",
+      "requirements": [
+        {
+          "expected_normalization": "resolved",
+          "head": "Python",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "essential",
+          "source_quote": "Python at working level is essential.",
+          "status": "supported",
+          "subject": "python",
+          "unit": "skill_level"
+        },
+        {
+          "expected_normalization": "resolved",
+          "head": "FastAPI",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "preferred",
+          "source_quote": "FastAPI at working level is preferred.",
+          "status": "supported",
+          "subject": "fastapi",
+          "unit": "skill_level"
+        }
+      ]
+    },
+    {
+      "id": "P6A-ADV-A03",
+      "kind": "adversarial",
+      "requirements": [
+        {
+          "expected_normalization": "resolved",
+          "head": "Python",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "essential",
+          "source_quote": "Python at working level is essential.",
+          "status": "supported",
+          "subject": "python",
+          "unit": "skill_level"
+        },
+        {
+          "expected_normalization": "resolved",
+          "head": "FastAPI",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "preferred",
+          "source_quote": "FastAPI at working level is preferred.",
+          "status": "supported",
+          "subject": "fastapi",
+          "unit": "skill_level"
+        }
+      ]
+    },
+    {
+      "id": "P6A-ADV-A04",
+      "kind": "adversarial",
+      "requirements": [
+        {
+          "expected_normalization": "resolved",
+          "head": "Python",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "essential",
+          "source_quote": "Python at working level is essential.",
+          "status": "supported",
+          "subject": "python",
+          "unit": "skill_level"
+        },
+        {
+          "expected_normalization": "resolved",
+          "head": "FastAPI",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "preferred",
+          "source_quote": "FastAPI at working level is preferred.",
+          "status": "supported",
+          "subject": "fastapi",
+          "unit": "skill_level"
+        }
+      ]
+    },
+    {
+      "id": "P6A-ADV-A05",
+      "kind": "adversarial",
+      "requirements": [
+        {
+          "expected_normalization": "resolved",
+          "head": "Python",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "essential",
+          "source_quote": "Python at working level is essential.",
+          "status": "supported",
+          "subject": "python",
+          "unit": "skill_level"
+        },
+        {
+          "expected_normalization": "resolved",
+          "head": "FastAPI",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "preferred",
+          "source_quote": "FastAPI at working level is preferred.",
+          "status": "supported",
+          "subject": "fastapi",
+          "unit": "skill_level"
+        }
+      ]
+    },
+    {
+      "id": "P6A-ADV-A06",
+      "kind": "adversarial",
+      "requirements": [
+        {
+          "expected_normalization": "resolved",
+          "head": "Python",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "essential",
+          "source_quote": "Python at working level is essential.",
+          "status": "supported",
+          "subject": "python",
+          "unit": "skill_level"
+        },
+        {
+          "expected_normalization": "resolved",
+          "head": "FastAPI",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "preferred",
+          "source_quote": "FastAPI at working level is preferred.",
+          "status": "supported",
+          "subject": "fastapi",
+          "unit": "skill_level"
+        }
+      ]
+    },
+    {
+      "id": "P6A-ADV-A07",
+      "kind": "adversarial",
+      "requirements": [
+        {
+          "expected_normalization": "resolved",
+          "head": "Python",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "essential",
+          "source_quote": "Python at working level is essential.",
+          "status": "supported",
+          "subject": "python",
+          "unit": "skill_level"
+        },
+        {
+          "expected_normalization": "resolved",
+          "head": "FastAPI",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "preferred",
+          "source_quote": "FastAPI at working level is preferred.",
+          "status": "supported",
+          "subject": "fastapi",
+          "unit": "skill_level"
+        }
+      ]
+    },
+    {
+      "id": "P6A-SEM-001",
+      "kind": "semantic",
+      "requirements": [
+        {
+          "expected_normalization": "abstained",
+          "head": "Python",
+          "kind": null,
+          "minimum": null,
+          "priority": "ambiguous",
+          "source_quote": "We are looking for engineers comfortable building services with Python.",
+          "status": "unknown",
+          "subject": "python",
+          "unit": null
+        }
+      ]
+    },
+    {
+      "id": "P6A-SEM-002",
+      "kind": "semantic",
+      "requirements": [
+        {
+          "expected_normalization": "abstained",
+          "head": "FastAPI",
+          "kind": null,
+          "minimum": null,
+          "priority": "ambiguous",
+          "source_quote": "The person in this role should be comfortable developing APIs using FastAPI.",
+          "status": "unknown",
+          "subject": "fastapi",
+          "unit": null
+        }
+      ]
+    },
+    {
+      "id": "P6A-SEM-003",
+      "kind": "semantic",
+      "requirements": [
+        {
+          "expected_normalization": "abstained",
+          "head": "Microsoft Azure",
+          "kind": null,
+          "minimum": null,
+          "priority": "ambiguous",
+          "source_quote": "We seek familiarity with Microsoft Azure when working with our cloud team.",
+          "status": "unknown",
+          "subject": "azure",
+          "unit": null
+        }
+      ]
+    },
+    {
+      "id": "P6A-SEM-004",
+      "kind": "semantic",
+      "requirements": [
+        {
+          "expected_normalization": "abstained",
+          "head": "French",
+          "kind": null,
+          "minimum": null,
+          "priority": "ambiguous",
+          "source_quote": "Applicants should communicate with our customers in professional French.",
+          "status": "unknown",
+          "subject": "french",
+          "unit": null
+        }
+      ]
+    },
+    {
+      "id": "P6A-SEM-005",
+      "kind": "semantic",
+      "requirements": [
+        {
+          "expected_normalization": "abstained",
+          "head": "local LLM integration",
+          "kind": null,
+          "minimum": null,
+          "priority": "ambiguous",
+          "source_quote": "We value hands-on local LLM integration when choosing candidates.",
+          "status": "unknown",
+          "subject": "llm_integration",
+          "unit": null
+        }
+      ]
+    },
+    {
+      "id": "P6A-SEM-006",
+      "kind": "semantic",
+      "requirements": [
+        {
+          "expected_normalization": "abstained",
+          "head": "experience",
+          "kind": null,
+          "minimum": null,
+          "priority": "ambiguous",
+          "source_quote": "Applicants should bring several years of professional experience.",
+          "status": "unknown",
+          "subject": "experience",
+          "unit": null
+        }
+      ]
+    },
+    {
+      "id": "P6A-SEM-007",
+      "kind": "semantic",
+      "requirements": []
+    },
+    {
+      "id": "P6A-SEM-008",
+      "kind": "semantic",
+      "requirements": []
+    },
+    {
+      "id": "P6A-ADV-A08",
+      "kind": "adversarial",
+      "requirements": [
+        {
+          "expected_normalization": "resolved",
+          "head": "Python",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "essential",
+          "source_quote": "Python at working level is essential;",
+          "status": "supported",
+          "subject": "python",
+          "unit": "skill_level"
+        },
+        {
+          "expected_normalization": "resolved",
+          "head": "FastAPI",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "preferred",
+          "source_quote": "FastAPI at working level is preferred.",
+          "status": "supported",
+          "subject": "fastapi",
+          "unit": "skill_level"
+        }
+      ]
+    },
+    {
+      "id": "P6A-ADV-A09",
+      "kind": "adversarial",
+      "requirements": [
+        {
+          "expected_normalization": "resolved",
+          "head": "Python",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "essential",
+          "source_quote": "Python at working level is essential;",
+          "status": "supported",
+          "subject": "python",
+          "unit": "skill_level"
+        },
+        {
+          "expected_normalization": "resolved",
+          "head": "FastAPI",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "preferred",
+          "source_quote": "FastAPI at working level is preferred.",
+          "status": "supported",
+          "subject": "fastapi",
+          "unit": "skill_level"
+        }
+      ]
+    },
+    {
+      "id": "P6A-ADV-A10",
+      "kind": "adversarial",
+      "requirements": [
+        {
+          "expected_normalization": "resolved",
+          "head": "Python",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "essential",
+          "source_quote": "Python at working level is essential;",
+          "status": "supported",
+          "subject": "python",
+          "unit": "skill_level"
+        },
+        {
+          "expected_normalization": "resolved",
+          "head": "FastAPI",
+          "kind": "skill",
+          "minimum": 2,
+          "priority": "preferred",
+          "source_quote": "FastAPI at working level is preferred;",
+          "status": "supported",
+          "subject": "fastapi",
+          "unit": "skill_level"
+        }
+      ]
+    }
+  ],
+  "schema_version": "actual-phase6a-supplemental-oracles-v1",
+  "synthetic": true
+}
