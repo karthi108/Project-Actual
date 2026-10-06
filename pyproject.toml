@@ -29,7 +29,7 @@ actual-model-probe = "actual.models.__main__:main"
 dev = ["pytest==9.1.1", "ruff==0.16.10", "mypy==2.4.0"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests/careerlab", "tests/core", "tests/persistence", "tests/application", "tests/api", "tests/models", "tests/intelligence"]
+testpaths = ["tests/careerlab", "tests/core", "tests/profile", "tests/persistence", "tests/application", "tests/api", "tests/models", "tests/intelligence"]
 pythonpath = ["src"]
 addopts = "-ra --strict-config --strict-markers --basetemp=.pytest-tmp-careerlab"
 
@@ -44,4 +44,4 @@ select = ["E", "F", "I", "UP", "B"]
 python_version = "3.13"
 mypy_path = "src"
 strict = true
-files = ["src", "migrations", "scripts/verify_phase5_live.py", "scripts/evaluate_phase6_live.py", "scripts/evaluate_phase6a_live.py", "scripts/phase6_journal.py", "scripts/phase6_monitor.py", "scripts/phase6_cleanup.py", "scripts/phase6a_results.py", "scripts/audit_phase6_provenance.py"]
+files = ["src", "migrations", "scripts/verify_phase5_live.py", "scripts/evaluate_phase6_live.py", "scripts/evaluate_phase6a_live.py", "scripts/phase6_journal.py", "scripts/phase6_monitor.py", "scripts/phase6_cleanup.py", "scripts/phase6a_results.py", "scripts/audit_phase6_provenance.py", "scripts/verify_phase7_profile.py"]

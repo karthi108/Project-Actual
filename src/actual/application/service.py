@@ -19,7 +19,9 @@ from actual.career.snapshot import CareerSnapshot
 from actual.core.primitives import (
     ActorId,
     ApplicationId,
+    ClaimId,
     EventId,
+    EvidenceId,
     Instant,
     JobId,
     WorkspaceId,
@@ -27,7 +29,9 @@ from actual.core.primitives import (
     content_digest,
 )
 from actual.core.references import BusinessObjectRef
-from actual.profile.contracts import Claim, EvidenceRecord, Profile, evidence_ref
+from actual.core.workflow import ContentReview
+from actual.profile.contracts import Claim, EvidenceRecord, EvidenceReview, Profile, evidence_ref
+from actual.profile.projection import EvidenceBackedProfileView, evidence_backed_profile
 
 from .commands import (
     AddJob,
@@ -41,6 +45,12 @@ from .commands import (
 )
 from .errors import UseCaseCode, UseCaseError
 from .ports import CareerRepository, CareerState
+from .profile_commands import (
+    ProfileRevisionCommand,
+    ReviewSyntheticClaim,
+    ReviewSyntheticEvidence,
+    WithdrawEvidence,
+)
 
 _INSTANT: TypeAdapter[datetime] = TypeAdapter(Instant)
 
@@ -94,6 +104,12 @@ class CareerService:
         if state is None:
             raise UseCaseError(UseCaseCode.RESOURCE_NOT_FOUND)
         return self._checked_state(state)
+
+    def evidence_profile(self) -> tuple[CareerState, EvidenceBackedProfileView]:
+        state = self.get_state()
+        with _domain_input():
+            view = evidence_backed_profile(state.snapshot.profile, as_of=state.snapshot.as_of)
+        return state, view
 
     def job(self, job_id: JobId) -> tuple[CareerState, Job]:
         with _domain_input():
@@ -330,6 +346,7 @@ class CareerService:
                 source_reference=command.source_reference,
                 source_actor_id=self.actor_id if command.source_kind == "user_report" else None,
                 collected_at=command.collected_at,
+                experience_context=command.experience_context,
             )
             replacement = claim.model_copy(
                 update={
@@ -347,6 +364,201 @@ class CareerService:
                 }
             )
             changed = state.snapshot.model_copy(update={"as_of": now, "profile": changed_profile})
+        return self._save(changed, state.generation)
+
+    @staticmethod
+    def _profile_pin(record: Claim | EvidenceRecord, command: ProfileRevisionCommand) -> None:
+        if (
+            record.revision != command.expected_revision
+            or record.snapshot_digest != command.expected_digest
+        ):
+            raise UseCaseError(UseCaseCode.STATE_CONFLICT)
+
+    @staticmethod
+    def _claim_material_dependencies(snapshot: CareerSnapshot, identifiers: set[ClaimId]) -> None:
+        if any(ref.claim_id in identifiers for cv in snapshot.cvs for ref in cv.claim_refs) or any(
+            ref.claim_id in identifiers
+            for draft in snapshot.drafts
+            for assertion in draft.assertions
+            for ref in assertion.source_claim_refs
+        ):
+            raise UseCaseError(UseCaseCode.DEPENDENCY_RECONCILIATION_REQUIRED)
+
+    @staticmethod
+    def _same_assertion_scope(left: Claim, right: EvidenceRecord) -> bool:
+        return (
+            left.assertion.kind,
+            left.assertion.subject,
+            left.assertion.unit,
+        ) == (
+            right.assertion.kind,
+            right.assertion.subject,
+            right.assertion.unit,
+        )
+
+    def _reconcile_profile_evidence(
+        self, snapshot: CareerSnapshot, replacement: EvidenceRecord
+    ) -> Profile:
+        """Rebind all current claim refs without implicitly accepting any claim."""
+        profile = snapshot.profile
+        records = tuple(
+            replacement if item.id == replacement.id else item for item in profile.evidence
+        )
+        claims: list[Claim] = []
+        changed_ids: set[ClaimId] = set()
+        for claim in profile.claims:
+            refs = tuple(
+                evidence_ref(replacement) if ref.evidence_id == replacement.id else ref
+                for ref in claim.evidence_refs
+            )
+            refs_changed = refs != claim.evidence_refs
+            contrary = any(
+                record.qualifies_contradiction and self._same_assertion_scope(claim, record)
+                for record in records
+            )
+            status = claim.status
+            if status != "withdrawn":
+                if contrary:
+                    status = "contradicted"
+                elif status == "contradicted" or (refs_changed and status == "reviewed_supported"):
+                    status = "candidate_support" if refs else "self_reported"
+            review = claim.review
+            if refs_changed or status != claim.status:
+                review = None
+            if refs_changed or status != claim.status or review != claim.review:
+                claim = claim.model_copy(
+                    update={
+                        "revision": claim.revision + 1,
+                        "evidence_refs": refs,
+                        "status": status,
+                        "review": review,
+                    }
+                )
+                changed_ids.add(claim.id)
+            claims.append(claim)
+        self._claim_material_dependencies(snapshot, changed_ids)
+        return profile.model_copy(
+            update={
+                "revision": profile.revision + 1,
+                "evidence": records,
+                "claims": tuple(claims),
+            }
+        )
+
+    def review_synthetic_evidence(
+        self, evidence_id: EvidenceId, command: ReviewSyntheticEvidence
+    ) -> CareerState:
+        command = _command(ReviewSyntheticEvidence, command)
+        with _domain_input():
+            evidence_id = EvidenceId.model_validate(evidence_id, strict=True)
+        state = self._mutation(command.expected_generation)
+        source = next(
+            (item for item in state.snapshot.profile.evidence if item.id == evidence_id), None
+        )
+        if source is None:
+            raise UseCaseError(UseCaseCode.RESOURCE_NOT_FOUND)
+        self._profile_pin(source, command)
+        if (
+            source.source_kind != "synthetic_fixture"
+            or source.status != "active"
+            or source.review is not None
+        ):
+            raise UseCaseError(UseCaseCode.STATE_CONFLICT)
+        now = self._now(state.snapshot)
+        with _domain_input():
+            reviewed = source.model_copy(
+                update={
+                    "revision": source.revision + 1,
+                    "review": EvidenceReview(
+                        reviewer_id=self.actor_id,
+                        kind="synthetic_review",
+                        method="explicit_synthetic_source_review_v1",
+                        reviewed_at=now,
+                        content_digest=source.content_digest,
+                    ),
+                }
+            )
+            profile = self._reconcile_profile_evidence(state.snapshot, reviewed)
+            changed = state.snapshot.model_copy(update={"as_of": now, "profile": profile})
+        return self._save(changed, state.generation)
+
+    def review_synthetic_claim(
+        self, claim_id: ClaimId, command: ReviewSyntheticClaim
+    ) -> CareerState:
+        command = _command(ReviewSyntheticClaim, command)
+        with _domain_input():
+            claim_id = ClaimId.model_validate(claim_id, strict=True)
+        state = self._mutation(command.expected_generation)
+        profile = state.snapshot.profile
+        claim = next((item for item in profile.claims if item.id == claim_id), None)
+        if claim is None:
+            raise UseCaseError(UseCaseCode.RESOURCE_NOT_FOUND)
+        self._profile_pin(claim, command)
+        if claim.status not in ("self_reported", "candidate_support") or claim.review is not None:
+            raise UseCaseError(UseCaseCode.STATE_CONFLICT)
+        evidence = {item.id: item for item in profile.evidence}
+        sources = tuple(evidence[ref.evidence_id] for ref in claim.evidence_refs)
+        if not any(
+            source.qualifies_support
+            and self._same_assertion_scope(claim, source)
+            and source.assertion.value >= claim.assertion.value
+            and (claim.assertion.kind != "experience" or source.experience_context is None)
+            for source in sources
+        ) or any(
+            source.qualifies_contradiction and self._same_assertion_scope(claim, source)
+            for source in profile.evidence
+        ):
+            raise UseCaseError(UseCaseCode.STATE_CONFLICT)
+        self._claim_material_dependencies(state.snapshot, {claim.id})
+        now = self._now(state.snapshot)
+        with _domain_input():
+            # Claim content excludes revision/review/status, so the new explicit
+            # review binds the next revision and unchanged structured content.
+            reviewed = claim.model_copy(
+                update={
+                    "revision": claim.revision + 1,
+                    "status": "reviewed_supported",
+                    "review": ContentReview(
+                        revision=claim.revision + 1,
+                        content_digest=claim.content_digest,
+                        reviewer_id=self.actor_id,
+                        reviewed_at=now,
+                        method="explicit_synthetic_claim_review_v1",
+                        decision="accepted",
+                    ),
+                }
+            )
+            changed_profile = profile.model_copy(
+                update={
+                    "revision": profile.revision + 1,
+                    "claims": tuple(
+                        reviewed if item.id == claim.id else item for item in profile.claims
+                    ),
+                }
+            )
+            changed = state.snapshot.model_copy(update={"as_of": now, "profile": changed_profile})
+        return self._save(changed, state.generation)
+
+    def withdraw_evidence(self, evidence_id: EvidenceId, command: WithdrawEvidence) -> CareerState:
+        command = _command(WithdrawEvidence, command)
+        with _domain_input():
+            evidence_id = EvidenceId.model_validate(evidence_id, strict=True)
+        state = self._mutation(command.expected_generation)
+        source = next(
+            (item for item in state.snapshot.profile.evidence if item.id == evidence_id), None
+        )
+        if source is None:
+            raise UseCaseError(UseCaseCode.RESOURCE_NOT_FOUND)
+        self._profile_pin(source, command)
+        if source.status != "active":
+            raise UseCaseError(UseCaseCode.STATE_CONFLICT)
+        now = self._now(state.snapshot)
+        with _domain_input():
+            withdrawn = source.model_copy(
+                update={"revision": source.revision + 1, "status": "withdrawn"}
+            )
+            profile = self._reconcile_profile_evidence(state.snapshot, withdrawn)
+            changed = state.snapshot.model_copy(update={"as_of": now, "profile": profile})
         return self._save(changed, state.generation)
 
     def create_application(self, command: CreateApplication) -> CareerState:

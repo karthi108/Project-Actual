@@ -1,9 +1,6 @@
 """Deterministic current scoped evidence comparisons, never semantic inference."""
 
 import json
-from typing import Any
-
-from pydantic import BaseModel
 
 from actual.career.assessments import (
     AssessmentReason,
@@ -15,78 +12,24 @@ from actual.career.assessments import (
 )
 from actual.career.jobs import Job
 from actual.career.requirements import InterpretedRequirement, RequirementConstraints
-from actual.core.primitives import (
-    ActorId,
-    ClaimId,
-    EvidenceId,
-    ProfileId,
-    WorkspaceId,
-)
-from actual.core.workflow import ContentReview
 from actual.job_intelligence.errors import IntelligenceCode, IntelligenceFailure
 from actual.job_intelligence.normalize import checked_job, normalize_requirement
 from actual.profile.contracts import (
     Assertion,
-    Claim,
-    EvidenceRecord,
-    EvidenceReview,
     Profile,
     claim_ref,
     evidence_ref,
 )
+from actual.profile.projection import EvidenceProjection, admit_profile, project_evidence
 
-MATCHING_VERSION = "career-evidence-matching-v2"
+MATCHING_VERSION = "career-evidence-matching-v3"
 
 
 def checked_profile(profile: Profile) -> Profile:
-    allowed = {
-        Profile,
-        Claim,
-        EvidenceRecord,
-        Assertion,
-        EvidenceReview,
-        ContentReview,
-        WorkspaceId,
-        ProfileId,
-        ActorId,
-        ClaimId,
-        EvidenceId,
-    }
-    # Exact graph admission catches data that a serializer could otherwise drop.
-    from actual.core.references import EvidenceRef
-
-    allowed.add(EvidenceRef)
-
-    def visit(value: Any) -> None:
-        if isinstance(value, BaseModel):
-            if (
-                type(value) not in allowed
-                or set(value.__dict__) - set(type(value).model_fields)
-                or value.__pydantic_extra__ is not None
-            ):
-                raise IntelligenceFailure(IntelligenceCode.INPUT_REJECTED)
-            for child in value.__dict__.values():
-                visit(child)
-        elif isinstance(value, (tuple, list)):
-            for child in value:
-                visit(child)
-
     try:
-        if type(profile) is not Profile:
-            raise IntelligenceFailure(IntelligenceCode.INPUT_REJECTED)
-        visit(profile)
-        result = Profile.model_validate(profile)
-        if result.classification != "synthetic":
-            raise IntelligenceFailure(IntelligenceCode.INPUT_REJECTED)
-        return result
-    except IntelligenceFailure:
-        raise
+        return admit_profile(profile)
     except Exception:
         raise IntelligenceFailure(IntelligenceCode.INPUT_REJECTED) from None
-
-
-def _scope(left: Assertion, right: Assertion) -> bool:
-    return (left.kind, left.subject, left.unit) == (right.kind, right.subject, right.unit)
 
 
 def _explanation(reason: AssessmentReason, requirement: RequirementLike, value: int | None) -> str:
@@ -112,7 +55,7 @@ def _explanation(reason: AssessmentReason, requirement: RequirementLike, value: 
     )
 
 
-def _match(profile: Profile, requirement: RequirementLike) -> RequirementAssessment:
+def _match(projection: EvidenceProjection, requirement: RequirementLike) -> RequirementAssessment:
     if requirement.resolution == "abstained":
         return RequirementAssessment(
             requirement=requirement,
@@ -122,18 +65,17 @@ def _match(profile: Profile, requirement: RequirementLike) -> RequirementAssessm
         )
     assertion = requirement.assertion
     assert assertion is not None
-    claims = sorted(
-        (claim for claim in profile.claims if _scope(claim.assertion, assertion)),
-        key=lambda claim: claim.id.root,
+    group = next(
+        (
+            item
+            for item in projection.groups
+            if item.scope == (assertion.kind, assertion.subject, assertion.unit)
+        ),
+        None,
     )
-    evidence = {record.id: record for record in profile.evidence}
-    contrary = [
-        record
-        for record in profile.evidence
-        if _scope(record.assertion, assertion)
-        and record.relation == "contradicts"
-        and record._qualifies_review
-    ]
+    claims = list(group.claims) if group is not None else []
+    evidence = {record.id: record for record in group.evidence} if group is not None else {}
+    contrary = list(group.contrary_evidence) if group is not None else []
     value: int | None = None
     declared = False
     selected_claims = claims
@@ -146,7 +88,21 @@ def _match(profile: Profile, requirement: RequirementLike) -> RequirementAssessm
         status, reason = "conflict", "conflicting_evidence"
         selected_evidence.extend(contrary)
     else:
-        reviewed = [claim for claim in claims if claim.status == "reviewed_supported"]
+        reviewed = list(group.reviewed_claims) if group is not None else []
+        if assertion.kind == "experience":
+            # Typed source durations describe their category only. The legacy
+            # generic-month requirement cannot establish that equivalence.
+            # Preserve legacy fixtures while abstaining on contextual sources.
+            reviewed = [
+                claim
+                for claim in reviewed
+                if any(
+                    evidence[ref.evidence_id].qualifies_support
+                    and evidence[ref.evidence_id].assertion.value >= claim.assertion.value
+                    and evidence[ref.evidence_id].experience_context is None
+                    for ref in claim.evidence_refs
+                )
+            ]
         if reviewed:
             value = max(claim.assertion.value for claim in reviewed)
             selected_claims = [claim for claim in reviewed if claim.assertion.value == value]
@@ -156,6 +112,10 @@ def _match(profile: Profile, requirement: RequirementLike) -> RequirementAssessm
                 for ref in claim.evidence_refs
                 if evidence[ref.evidence_id].qualifies_support
                 and evidence[ref.evidence_id].assertion.value >= value
+                and (
+                    assertion.kind != "experience"
+                    or evidence[ref.evidence_id].experience_context is None
+                )
             ]
             if (
                 value >= assertion.value
@@ -202,6 +162,7 @@ def match_requirements(
     """Resolve every dependency against current inputs; reject stale or forged data."""
     checked_source = checked_job(job)
     checked_candidate = checked_profile(profile)
+    projection = project_evidence(checked_candidate)
     if (
         checked_source.workspace_id != checked_candidate.workspace_id
         or type(requirements) is not tuple
@@ -264,7 +225,7 @@ def match_requirements(
                 concepts.add(checked.canonical_concept)
             checked_requirements.append(checked)
         ordered = sorted(checked_requirements, key=lambda item: (item.concept_start, item.id.root))
-        rows = tuple(_match(checked_candidate, requirement) for requirement in ordered)
+        rows = tuple(_match(projection, requirement) for requirement in ordered)
         payload: dict[str, object] = {
             "schema_version": "actual-core-v1",
             "workspace_id": checked_source.workspace_id.root,

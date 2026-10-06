@@ -8,6 +8,7 @@ from actual.career.applications import Application
 from actual.career.jobs import Job
 from actual.career.snapshot import CareerSnapshot
 from actual.profile.contracts import Profile
+from actual.profile.projection import EvidenceBackedProfileView
 
 type Generation = Annotated[int, Field(strict=True, ge=1, le=9223372036854775807)]
 
@@ -30,6 +31,11 @@ class JobView(ApiModel):
 class ProfileView(ApiModel):
     generation: Generation
     profile: Profile
+
+
+class EvidenceProfileResponse(ApiModel):
+    generation: Generation
+    profile: EvidenceBackedProfileView
 
 
 class ApplicationView(ApiModel):

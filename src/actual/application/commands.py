@@ -19,6 +19,7 @@ from actual.core.primitives import (
     Text,
 )
 from actual.profile.contracts import Assertion
+from actual.profile.experience import ExperienceContext
 
 type ExpectedGeneration = Annotated[int, Field(strict=True, ge=1, le=9223372036854775806)]
 type InitialGeneration = Annotated[int, Field(strict=True, ge=0, le=0)]
@@ -88,6 +89,7 @@ class AttachEvidence(Command):
     source_reference: SourceReference
     excerpt: Text
     collected_at: Instant
+    experience_context: ExperienceContext | None = None
 
 
 class CreateApplication(Command):

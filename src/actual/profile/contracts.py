@@ -4,9 +4,15 @@ These contracts establish bounded factual support, not prose truth, source
 authenticity, hiring suitability or authorization.
 """
 
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
-from pydantic import Field, ValidationError, model_validator
+from pydantic import (
+    Field,
+    SerializerFunctionWrapHandler,
+    ValidationError,
+    model_serializer,
+    model_validator,
+)
 
 from actual.core.primitives import (
     ActorId,
@@ -28,6 +34,7 @@ from actual.core.primitives import (
 )
 from actual.core.references import ClaimRef, EvidenceRef
 from actual.core.workflow import ContentReview
+from actual.profile.experience import ExperienceContext
 
 type ClaimStatus = Literal[
     "self_reported", "candidate_support", "reviewed_supported", "contradicted", "withdrawn"
@@ -93,26 +100,35 @@ class EvidenceRecord(Contract):
     source_reference: SourceReference
     source_actor_id: ActorId | None = None
     collected_at: Instant
+    experience_context: ExperienceContext | None = None
     review: EvidenceReview | None = None
     status: Literal["active", "withdrawn"] = "active"
 
     @property
     def content_digest(self) -> str:
-        return content_digest(
-            self.model_dump(
-                mode="json",
-                include={
-                    "assertion",
-                    "relation",
-                    "excerpt",
-                    "source_kind",
-                    "source_reference",
-                    "source_actor_id",
-                    "collected_at",
-                    "classification",
-                },
-            )
+        payload = self.model_dump(
+            mode="json",
+            include={
+                "assertion",
+                "relation",
+                "excerpt",
+                "source_kind",
+                "source_reference",
+                "source_actor_id",
+                "collected_at",
+                "classification",
+                "experience_context",
+            },
         )
+        return content_digest(payload)
+
+    @model_serializer(mode="wrap")
+    def serialize_optional_context(self, handler: SerializerFunctionWrapHandler) -> dict[str, Any]:
+        """An absent extension preserves every accepted legacy wire byte/hash."""
+        payload: dict[str, Any] = handler(self)
+        if self.experience_context is None:
+            payload.pop("experience_context", None)
+        return payload
 
     @property
     def snapshot_digest(self) -> str:
@@ -121,6 +137,17 @@ class EvidenceRecord(Contract):
 
     @model_validator(mode="after")
     def review_binding(self) -> Self:
+        if self.experience_context is not None:
+            if self.assertion.kind != "experience":
+                raise ValueError("Experience context requires an experience assertion")
+            if any(
+                instant is not None and instant > self.collected_at
+                for instant in (
+                    self.experience_context.started_at,
+                    self.experience_context.ended_at,
+                )
+            ):
+                raise ValueError("Experience activity dates cannot follow source collection")
         if self.source_kind == "synthetic_fixture" and self.classification != "synthetic":
             raise ValueError("Synthetic evidence cannot be classified as real source data")
         if self.review is None:
@@ -150,8 +177,25 @@ class EvidenceRecord(Contract):
 
     @property
     def qualifies_support(self) -> bool:
-        """Reviewed positive structured support, never a verification certificate."""
-        return self.relation == "supports" and self._qualifies_review
+        """Reviewed accepted assertion scope, never a verification certificate.
+
+        Category-specific experience sources may be reviewed, but they cannot
+        prove the generic duration asserted by the legacy claim vocabulary.
+        """
+        return (
+            self.relation == "supports"
+            and self._qualifies_review
+            and self.experience_context is None
+        )
+
+    @property
+    def qualifies_contradiction(self) -> bool:
+        """Category-specific source review cannot refute generic duration either."""
+        return (
+            self.relation == "contradicts"
+            and self._qualifies_review
+            and self.experience_context is None
+        )
 
 
 class Claim(Contract):
@@ -290,9 +334,7 @@ class Profile(Contract):
             # Contrary reviewed facts belong to the whole scoped profile. A
             # proposal cannot hide them by selecting only favorable references.
             contrary = any(
-                record.relation == "contradicts"
-                and record._qualifies_review
-                and _same_scope(claim.assertion, record.assertion)
+                record.qualifies_contradiction and _same_scope(claim.assertion, record.assertion)
                 for record in self.evidence
             )
             if contrary and claim.status not in ("contradicted", "withdrawn"):

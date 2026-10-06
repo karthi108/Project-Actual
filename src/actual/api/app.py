@@ -21,11 +21,16 @@ from actual.application.commands import (
 )
 from actual.application.errors import UseCaseCode, UseCaseError
 from actual.application.ports import CareerState
+from actual.application.profile_commands import (
+    ReviewSyntheticClaim,
+    ReviewSyntheticEvidence,
+    WithdrawEvidence,
+)
 from actual.application.service import CareerService
 from actual.career.applications import Application
 from actual.career.events import WorkEvent
 from actual.career.jobs import Job
-from actual.core.primitives import ApplicationId, JobId
+from actual.core.primitives import ApplicationId, ClaimId, EvidenceId, JobId
 from actual.persistence.database import create_database_engine, verify_schema
 from actual.persistence.errors import (
     ConflictError,
@@ -42,6 +47,7 @@ from .contracts import (
     ApplicationView,
     CareerView,
     ErrorResponse,
+    EvidenceProfileResponse,
     Health,
     JobView,
     Page,
@@ -56,6 +62,8 @@ type Offset = Annotated[int, Query(ge=0, le=1_000_000)]
 type Limit = Annotated[int, Query(ge=1, le=100)]
 type JobPath = Annotated[str, Path(pattern=r"^job_[0-9a-f]{32}$")]
 type ApplicationPath = Annotated[str, Path(pattern=r"^application_[0-9a-f]{32}$")]
+type EvidencePath = Annotated[str, Path(pattern=r"^evidence_[0-9a-f]{32}$")]
+type ClaimPath = Annotated[str, Path(pattern=r"^claim_[0-9a-f]{32}$")]
 
 _ERRORS: dict[UseCaseCode, tuple[int, str]] = {
     UseCaseCode.RESOURCE_NOT_FOUND: (404, "The requested resource is absent."),
@@ -110,8 +118,9 @@ def create_app(
         version="1.0.0",
         description=(
             "Isolated local synthetic development only. No authentication or real-data access. "
-            "All mutations require the current aggregate generation; review/verification and "
-            "external submission are not API operations."
+            "All mutations require the current aggregate generation. Synthetic source and claim "
+            "reviews are separate operations; independent verification and external submission "
+            "are not API operations."
         ),
         lifespan=lifespan,
         docs_url=None,
@@ -256,6 +265,48 @@ def create_app(
     def attach_evidence(command: AttachEvidence, service: Service) -> ProfileView:
         """Attach an unreviewed source to an unreviewed, material-independent claim."""
         state = service.attach_evidence(command)
+        return ProfileView(generation=state.generation, profile=state.snapshot.profile)
+
+    @router.get("/profile/evidence", response_model=EvidenceProfileResponse, tags=["profile"])
+    def evidence_profile(service: Service) -> EvidenceProfileResponse:
+        """Read current declarations, source reviews, support and conflicts separately."""
+        state, view = service.evidence_profile()
+        return EvidenceProfileResponse(generation=state.generation, profile=view)
+
+    @router.post(
+        "/profile/evidence/{evidence_id}/synthetic-review",
+        response_model=ProfileView,
+        tags=["profile"],
+    )
+    def review_evidence(
+        evidence_id: EvidencePath, command: ReviewSyntheticEvidence, service: Service
+    ) -> ProfileView:
+        """Review an exact synthetic fixture source; this does not accept its claims."""
+        state = service.review_synthetic_evidence(EvidenceId(evidence_id), command)
+        return ProfileView(generation=state.generation, profile=state.snapshot.profile)
+
+    @router.post(
+        "/profile/claims/{claim_id}/synthetic-review",
+        response_model=ProfileView,
+        tags=["profile"],
+    )
+    def review_claim(
+        claim_id: ClaimPath, command: ReviewSyntheticClaim, service: Service
+    ) -> ProfileView:
+        """Accept a pinned claim only against sufficient current reviewed synthetic support."""
+        state = service.review_synthetic_claim(ClaimId(claim_id), command)
+        return ProfileView(generation=state.generation, profile=state.snapshot.profile)
+
+    @router.post(
+        "/profile/evidence/{evidence_id}/withdraw",
+        response_model=ProfileView,
+        tags=["profile"],
+    )
+    def withdraw_evidence(
+        evidence_id: EvidencePath, command: WithdrawEvidence, service: Service
+    ) -> ProfileView:
+        """Retain a withdrawn source and atomically invalidate dependent claim support."""
+        state = service.withdraw_evidence(EvidenceId(evidence_id), command)
         return ProfileView(generation=state.generation, profile=state.snapshot.profile)
 
     @router.post(

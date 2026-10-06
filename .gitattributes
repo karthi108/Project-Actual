@@ -11,6 +11,8 @@
 # Preserve the original user attachments byte-for-byte, including line endings.
 docs/reference/actual-master-specification.md -text
 docs/reference/actual-local-first-supplement.md -text
+docs/reference/phase-7-verified-career-profile.md -text whitespace=trailing-space,space-before-tab,cr-at-eol
+docs/reference/office-continuous-build.md -text whitespace=trailing-space,space-before-tab,cr-at-eol
 # Reproduce the literal bytes bound by the Phase-6A evaluation freeze.
 # Frozen evaluator artifacts retain CRLF bytes; check whitespace with CR terminators.
 datasets/phase6a/evaluation-annotations-v1.json -text whitespace=trailing-space,space-before-tab,cr-at-eol
