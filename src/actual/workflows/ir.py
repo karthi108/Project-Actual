@@ -45,6 +45,22 @@ def slot(name: str, type_: ValueType) -> Slot:
 
 CAPABILITIES = (
     Capability(
+        name="extract_meeting_actions",
+        kind="deterministic",
+        inputs=(slot("text", "text"),),
+        outputs=(slot("actions", "text"), slot("count", "integer")),
+        effect="READ_ONLY",
+        idempotency="pure",
+    ),
+    Capability(
+        name="triage_subject",
+        kind="deterministic",
+        inputs=(slot("text", "text"),),
+        outputs=(slot("category", "text"), slot("needs_review", "boolean")),
+        effect="READ_ONLY",
+        idempotency="pure",
+    ),
+    Capability(
         name="copy_text",
         kind="deterministic",
         inputs=(slot("text", "text"),),

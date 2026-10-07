@@ -170,6 +170,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: judgments remain labeled human claims/synthetic design reviews; repetition alone cannot prove redundancy. No invented savings; missing measurements remain unavailable.
 - Canonical acceptance: PENDING.
 
-## Phases 21–27
+## Phase 21 — General personal workflow families
+
+- Implementation commit: unique `wip(phase-21):` checkpoint; preceding Phase 20 `81c2304`.
+- Implementation: IMPLEMENTED synthetic structured meeting-action and conservative subject-triage families on the same engine. Additive registered deterministic handlers preserve original definition bytes.
+- Checks run here: 54 pure checks on both supported Python versions, Ruff and strict typing both targets; malformed notes/instructions, unknown dates/assignees, triage branches, effect isolation and original definition preservation passed.
+- Checks not run: real meetings/mailbox, interpretation accuracy or live provider integration.
+- Environment dependency: existing Python only; no new model or service.
+- Security validation pending: canonical structured input/catalog compatibility and untrusted subject/document review.
+- Live integration pending: all personal provider sources and any free-prose extraction.
+- Known limitations: notes must be structured synthetic tokens; no inferred tasks/dates or facts. Subject classification is a tiny deterministic prefix rule; human-review disposition is not completion of human work.
+- Canonical acceptance: PENDING.
+
+## Phases 22–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.

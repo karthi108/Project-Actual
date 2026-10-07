@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Literal, Protocol
 
 from .connectors import ReadConnector, ToolError
+from .deterministic import execute as deterministic
 from .ir import Step, Workflow
 from .state import Output, Progress, Run, Value
 
@@ -138,12 +139,10 @@ class Runtime:
             if step.kind in ("ai", "tool") and self.mode != "synthetic":
                 error, retryable = "mode_denied", False
             elif step.kind == "deterministic":
-                supplied = inputs(run, step)[0].value
-                values = (
-                    (Value(name="text", value=supplied),)
-                    if step.capability == "copy_text"
-                    else (Value(name="value", value=bool(str(supplied).strip())),)
-                )
+                try:
+                    values = deterministic(step, inputs(run, step))
+                except ToolError as failure:
+                    error, retryable = failure.code, False
             elif step.kind == "tool" and step.effect != "READ_ONLY" and self.effects is not None:
                 try:
                     values = self.effects.execute(run, step, inputs(run, step), fence)
