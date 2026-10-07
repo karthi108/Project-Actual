@@ -19,6 +19,12 @@ class Deny:
         return False
 
 
+class EffectExecutor(Protocol):
+    def execute(
+        self, run: Run, step: Step, values: tuple[Value, ...], fence: int
+    ) -> tuple[Value, ...]: ...
+
+
 def inputs(run: Run, step: Step) -> tuple[Value, ...]:
     result: list[Value] = []
     for binding in step.inputs:
@@ -72,9 +78,11 @@ class Runtime:
         policy: Policy | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
         connector: ReadConnector | None = None,
+        effects: EffectExecutor | None = None,
     ):
         self.store, self.policy, self.clock = store, policy or Deny(), clock
         self.connector = connector
+        self.effects = effects
 
     def tick(self, identifier: str) -> Run:
         now = self.clock()
@@ -124,6 +132,11 @@ class Runtime:
                     if step.capability == "copy_text"
                     else (Value(name="value", value=bool(str(supplied).strip())),)
                 )
+            elif step.kind == "tool" and step.effect != "READ_ONLY" and self.effects is not None:
+                try:
+                    values = self.effects.execute(run, step, inputs(run, step), fence)
+                except ToolError as failure:
+                    error, retryable = failure.code, False
             elif step.kind == "tool" and self.connector is not None:
                 try:
                     values = self.connector.execute(run, step, inputs(run, step))

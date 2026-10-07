@@ -4,9 +4,9 @@ from typing import Annotated, Literal, Protocol
 
 from pydantic import Field, ValidationError
 
-from actual.core.primitives import ActorId, Contract, WorkspaceId
+from actual.core.primitives import ActorId, Contract, Digest, WorkspaceId
 
-from .ir import Step
+from .ir import Name, Step
 from .state import Run, Value
 
 type ErrorCode = Literal[
@@ -55,6 +55,10 @@ class Access(Contract):
     capability: Literal["fake_read", "fake_write"]
     resource: Literal["synthetic_record", "synthetic_hostile", "synthetic_inbox"]
     policy_version: Annotated[int, Field(ge=1)] = 1
+    workflow_digest: Digest | None = None
+    step: Name | None = None
+    arguments_digest: Digest | None = None
+    intent_digest: Digest | None = None
 
 
 class Authorizer(Protocol):

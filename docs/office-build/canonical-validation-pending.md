@@ -74,6 +74,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: one fabricated resource reader, fixed catalog, synthetic labels cannot authenticate private prose. Provider errors expose closed codes without raw diagnostics.
 - Canonical acceptance: PENDING.
 
-## Phases 13–27
+## Phase 13 — Human approval and effect intents
+
+- Implementation commit: unique `wip(phase-13):` checkpoint; preceding Phase 12 `b5a7e41`.
+- Implementation: IMPLEMENTED. Exact previews/approval transitions, atomic durable intent binding, immediate authority/expiry/revocation/fence checks, append-oriented metadata audit and conservative fake-provider reconciliation.
+- Checks run here: 41 combined workflow/runtime/approval checks on each supported Python against real disposable PostgreSQL; final 11 approval checks passed on both versions after adding the missing-approval bypass case; strict mypy both workflow targets, Ruff and frozen artifact audit. Concurrency across workflow versions, changed payload conflict, denial, expiry, revocation, cancellation and lost acknowledgement passed.
+- Checks not run: real providers, authenticated human UI, canonical crash/process and long-lived concurrency acceptance; full regression deferred to final office checks.
+- Environment dependency: existing Python/PostgreSQL, separate explicit approval migration. Fake provider receipt uses a distinct transaction to represent remote uncertainty.
+- Security validation pending: canonical approval/canonicalization/authority/audit review and real provider dispatch-boundary semantics. Trusted service actor/configuration is not public authentication.
+- Live integration pending: all real effect providers, provider retention/idempotency expiry and compensation. No external message is sent.
+- Known limitations: short synthetic human wait; no approval UI or daemon; unknown outcomes require read-only reconciliation and never automatic resend. Cancellation after the committed dispatch marker cannot undo remote acceptance. Append-oriented audit is not administrator-proof.
+- Canonical acceptance: PENDING.
+
+## Phases 14–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.
