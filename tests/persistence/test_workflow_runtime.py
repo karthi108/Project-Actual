@@ -5,8 +5,9 @@ import pytest
 from sqlalchemy import event, select, text
 from sqlalchemy.exc import NoResultFound
 
-from actual.core.primitives import WorkspaceId
-from actual.workflows.examples import effect_workflow, text_workflow
+from actual.core.primitives import ActorId, WorkspaceId
+from actual.workflows.connectors import FakeReader, LocalPolicy, ReadConnector
+from actual.workflows.examples import effect_workflow, read_workflow, text_workflow
 from actual.workflows.ir import Binding, Edge, Retry, Step, Workflow
 from actual.workflows.runtime import Runtime
 from actual.workflows.state import Value
@@ -187,3 +188,21 @@ def test_timeout_recovery_and_atomic_audit_rollback(pg_engine):
             == "0001_career_persistence"
         )
     assert Runtime(repo, clock=lambda: NOW + timedelta(seconds=62)).tick(run.id).current == "done"
+
+
+def test_connector_executes_only_with_current_scoped_permission(pg_engine):
+    repo = store(pg_engine)
+    actor = ActorId("actor_" + "1" * 32)
+    policy = LocalPolicy(OWNER, actor, frozenset(("fake_read",)))
+    connector = ReadConnector(FakeReader(), actor, policy)
+    run = repo.start(
+        read_workflow(), "read_ok", (Value(name="resource", value="synthetic_record"),), NOW
+    )
+    runtime = Runtime(repo, clock=lambda: NOW, connector=connector)
+    runtime.tick(run.id)
+    assert runtime.tick(run.id).outputs[0].values[0].value == "Fabricated record"
+    denied = repo.start(read_workflow(), "read_denied", run.trigger, NOW)
+    runtime.tick(denied.id)
+    policy.revoked = True
+    result = runtime.tick(denied.id)
+    assert result.current == "failed" and result.failure_code == "denied" and not result.outputs

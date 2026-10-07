@@ -62,3 +62,28 @@ def effect_workflow() -> Workflow:
             Edge(source="send", outcome="error", target="failed"),
         ),
     )
+
+
+def read_workflow() -> Workflow:
+    return Workflow(
+        id="synthetic_read",
+        version=1,
+        trigger_schema=(slot("resource", "text"),),
+        steps=(
+            Step(id="start", kind="trigger"),
+            Step(
+                id="read",
+                kind="tool",
+                capability="fake_read",
+                permissions=("fake_read",),
+                inputs=(Binding(name="resource", source="trigger", field="resource"),),
+            ),
+            Step(id="done", kind="terminate"),
+            Step(id="failed", kind="terminate", terminal="failed"),
+        ),
+        edges=(
+            Edge(source="start", outcome="success", target="read"),
+            Edge(source="read", outcome="success", target="done"),
+            Edge(source="read", outcome="error", target="failed"),
+        ),
+    )

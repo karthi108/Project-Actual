@@ -42,3 +42,4 @@ class Run(Contract):
     due_at: Instant | None = None
     outputs: Annotated[tuple[Output, ...], Field(max_length=64)] = ()
     progress: Annotated[tuple[Progress, ...], Field(max_length=320)] = ()
+    failure_code: Name | None = None

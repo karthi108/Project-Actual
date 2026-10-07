@@ -11,7 +11,8 @@ Each phase has a separate WIP checkpoint. The implementation commit is located b
 | 9 | Implemented; checkpoint `wip(phase-9): add evidence-backed application preparation` | 1,467 tests on each Python version with real PostgreSQL; strict typing, frozen audit, web build and 3 browser journeys passed | PENDING |
 | 10 | Implemented; checkpoint `wip(phase-10): add typed workflow IR` | Dual-Python adversarial graph/schema checks, typing and Ruff | PENDING |
 | 11 | Implemented; durable PostgreSQL runtime | 22 workflow/runtime tests on each Python version, strict typing, Ruff and frozen integrity | PENDING |
-| 12–27 | Development continues in roadmap order | Recorded at each checkpoint | PENDING |
+| 12 | Implemented; typed fake connector boundary | 23 pure tests and 8 real-PostgreSQL runtime tests on both Python versions, typing and Ruff | PENDING |
+| 13–27 | Development continues in roadmap order | Recorded at each checkpoint | PENDING |
 
 [Validation debt](canonical-validation-pending.md) records actual checks and outstanding personal-environment validation. [Phase-7 verification](../phase-7/migration-verification.md) contains reproduced office results. Frozen evaluation records remain historical; deterministic replay is not fresh inference or independent held-out evidence.
 

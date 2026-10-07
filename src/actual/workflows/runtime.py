@@ -4,6 +4,7 @@ from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from typing import Protocol
 
+from .connectors import ReadConnector, ToolError
 from .ir import Step, Workflow
 from .state import Output, Progress, Run, Value
 from .storage import Store
@@ -70,8 +71,10 @@ class Runtime:
         store: Store,
         policy: Policy | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+        connector: ReadConnector | None = None,
     ):
         self.store, self.policy, self.clock = store, policy or Deny(), clock
+        self.connector = connector
 
     def tick(self, identifier: str) -> Run:
         now = self.clock()
@@ -113,6 +116,7 @@ class Runtime:
             changed = route(workflow, run, "true" if inputs(run, step)[0].value else "false", now)
         else:
             values: tuple[Value, ...] = ()
+            error, retryable = "unavailable", True
             if step.kind == "deterministic":
                 supplied = inputs(run, step)[0].value
                 values = (
@@ -120,9 +124,14 @@ class Runtime:
                     if step.capability == "copy_text"
                     else (Value(name="value", value=bool(str(supplied).strip())),)
                 )
+            elif step.kind == "tool" and self.connector is not None:
+                try:
+                    values = self.connector.execute(run, step, inputs(run, step))
+                except ToolError as failure:
+                    error, retryable = failure.code, failure.retryable
             if values:
                 changed = route(workflow, run, "success", now, values)
-            elif run.attempts + 1 < step.retry.attempts:
+            elif retryable and run.attempts + 1 < step.retry.attempts:
                 changed = run.model_copy(
                     update={
                         "status": "waiting",
@@ -136,14 +145,17 @@ class Runtime:
                             Progress(
                                 step=step.id,
                                 attempt=run.attempts + 1,
-                                outcome="unavailable",
+                                outcome=error,
                                 at=now,
                             ),
                         ),
+                        "failure_code": error,
                     }
                 )
             else:
-                changed = route(workflow, run, "error", now)
+                changed = route(workflow, run, "error", now).model_copy(
+                    update={"failure_code": error}
+                )
         finished = self.clock()
         if finished >= now + timedelta(seconds=step.timeout_seconds):
             # Pure computation can be repeated after lease expiry, never committed late.

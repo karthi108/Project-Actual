@@ -61,6 +61,19 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: single DAG cursor, bounded scalar payload, no background scheduler. Lease fencing protects local progress; remote effect safety requires a distinct durable intent protocol.
 - Canonical acceptance: PENDING.
 
-## Phases 12–27
+## Phase 12 — Controlled connectors
+
+- Implementation commit: unique `wip(phase-12):` checkpoint; preceding Phase 11 `e291af9`.
+- Implementation: IMPLEMENTED. Closed fabricated read/write contracts, default-deny scoped authorizer, fake read runtime and safe error codes. Write dispatch remains denied.
+- Checks run here: 23 pure workflow/connector tests and 8 real-PostgreSQL runtime tests on each supported Python version; Ruff, strict typing on both workflow targets, CareerLab environment integrity. Exact permission, revocation, destination rejection, malicious output and provider error redaction passed.
+- Failed attempts preserved: initial import used a nonexistent principal identifier; corrected to accepted `ActorId`. Lint formatting/import findings corrected before clean checks.
+- Checks not run: real provider/OAuth/network interoperability and full canonical regression. No live accounts connected.
+- Environment dependency: existing Python/PostgreSQL only; no added dependencies or credentials.
+- Security validation pending: canonical connector scope/error/egress adversarial review.
+- Live integration pending: all real connectors; current `WritePort` has no enabled implementation.
+- Known limitations: one fabricated resource reader, fixed catalog, synthetic labels cannot authenticate private prose. Provider errors expose closed codes without raw diagnostics.
+- Canonical acceptance: PENDING.
+
+## Phases 13–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.
