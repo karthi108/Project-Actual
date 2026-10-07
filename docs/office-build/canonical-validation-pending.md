@@ -218,6 +218,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: seals detect inconsistent records, not administrator compromise. Earlier provisional effect approvals lack the full seal and require a fresh review/run. Synthetic classification and loopback do not authenticate/detect real data. Accepted artifacts and Career migrations remain unchanged.
 - Canonical acceptance: PENDING.
 
-## Phases 25–27
+## Phase 25 — Deployment preparation
+
+- Implementation commit: unique `wip(phase-25):` checkpoint; preceding Phase 24 `9aec149`.
+- Implementation: IMPLEMENTED private Linux Dockerfiles/Compose, explicit secret-backed migration/check/serve, OVH/OpenStack configuration, TLS probe config, SHA-pinned verification CI, bounded OTLP/HTTP JSON instrumentation and recovery runbook.
+- Checks run here: 251 workflow/model/deployment unit checks and the real-PostgreSQL deployment migration/role check on each supported Python version; four YAML files parsed, Ruff and strict typing both targets. Initial telemetry fixture clock used the wall clock against a historical synthetic run (249 passed, 2 failed); corrected to the same fixture clock, preserving deadline enforcement. Role grants were exercised against every named table and refused audit UPDATE and DDL.
+- Checks not run: Docker builds/volume initialization/network isolation, Terraform fmt/init/validate/lock/plan, Nginx TLS/certificates, actual Collector interoperability, hosted GitHub Actions, OVH deployment or physical/cloud backup restore.
+- Environment dependency: supported private Linux Docker host, reviewed image tags/digests, mounted secrets, optional Collector 0.162.0, Terraform/OpenStack 3.4.0, operator-supplied OVH account/region/image/network. Docker/Terraform unavailable here; registry tag endpoints unavailable in review. No SDK or infrastructure tool installed.
+- Security validation pending: canonical container/users/ports/firewall/context, file permissions, runtime roles, telemetry privacy, TLS and state/backend review.
+- Live integration pending: all deployment platforms, domain/TLS and hosted CI; none activated or published.
+- Known limitations: private synthetic rehearsal only; host network is trusted code access, not untrusted-code isolation. OTLP instrumentation is a small manual protocol exporter, not SDK/full tracing/guaranteed audit. TLS probe forwards no API. Old backups cannot authorize redispatch. Version-tag images still require digest and compatibility resolution.
+- Canonical acceptance: PENDING.
+
+## Phases 26–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.

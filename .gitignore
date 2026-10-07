@@ -14,6 +14,11 @@
 *.sqlite
 *.sqlite3
 *.log
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
 
 # Locked inputs and generated evaluator labels; public development inputs are versioned.
 /datasets/locked_test/
