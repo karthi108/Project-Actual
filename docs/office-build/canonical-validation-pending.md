@@ -158,6 +158,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: deterministic phrase catalog; unrecognized explanation requires manual review. Confirmation preserves human-claim provenance and never grants policy/permission/approval. No raw transcript/audio retained by candidate storage.
 - Canonical acceptance: PENDING.
 
-## Phases 20–27
+## Phase 20 — Improvement engine
+
+- Implementation commit: unique `wip(phase-20):` checkpoint; preceding Phase 19 `7ff6578`.
+- Implementation: IMPLEMENTED. Exact observation/review-linked proposals following the agreed mechanism hierarchy, conservative consequence preservation, explicit matched measurement comparisons.
+- Checks run here: 51 pure checks on both supported Python versions, Ruff and strict typing both targets. Evidence rejection, mechanism ordering, conflicting risk, no automatic execution and matched/missing measurements passed. Long literal lint findings corrected before clean checks.
+- Checks not run: real improvement validity, active-time instrumentation, compute/monetary measurement or measured ROI.
+- Environment dependency: Python only.
+- Security validation pending: canonical review provenance and risk/conflicting-judgment review.
+- Live integration pending: none enabled; recommendations do not change policy/workflows/materials or execute effects.
+- Known limitations: judgments remain labeled human claims/synthetic design reviews; repetition alone cannot prove redundancy. No invented savings; missing measurements remain unavailable.
+- Canonical acceptance: PENDING.
+
+## Phases 21–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.
