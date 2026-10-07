@@ -1,3 +1,5 @@
+"""Real database deployment/role checks, distinct from the accepted API test module."""
+
 from pathlib import Path
 from uuid import uuid4
 
