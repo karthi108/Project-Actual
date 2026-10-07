@@ -30,6 +30,7 @@ class Result(Contract):
     policy_denials: Annotated[int, Field(ge=0)]
     failure_code: Name | None
     steps: tuple[Name, ...]
+    outcomes: tuple[Name, ...]
     model_calls: Literal[0] = 0
     provider_calls: Literal[0] = 0
 
@@ -115,4 +116,5 @@ def replay(case: Case, mode: Literal["replay", "shadow"] = "replay") -> Result:
         policy_denials=sum(p.outcome == "deny" for p in run.progress),
         failure_code=run.failure_code,
         steps=tuple(p.step for p in run.progress),
+        outcomes=tuple(p.outcome for p in run.progress),
     )

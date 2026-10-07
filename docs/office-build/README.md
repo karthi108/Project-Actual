@@ -14,7 +14,8 @@ Each phase has a separate WIP checkpoint. The implementation commit is located b
 | 12 | Implemented; typed fake connector boundary | 23 pure tests and 8 real-PostgreSQL runtime tests on both Python versions, typing and Ruff | PENDING |
 | 13 | Implemented; exact approvals and durable fake effect intents | 41 combined checks on both Python versions; final 11 approval checks on both versions; typing, Ruff and frozen audit | PENDING |
 | 14 | Implemented; isolated WorkLab replay | 26 pure checks on both Python versions; five deterministic development cases, typing and Ruff | PENDING |
-| 15–27 | Development continues in roadmap order | Recorded at each checkpoint | PENDING |
+| 15 | Implemented; persisted synthetic shadow comparisons | 30 pure checks and shadow database checks on both Python versions, typing and Ruff | PENDING |
+| 16–27 | Development continues in roadmap order | Recorded at each checkpoint | PENDING |
 
 [Validation debt](canonical-validation-pending.md) records actual checks and outstanding personal-environment validation. [Phase-7 verification](../phase-7/migration-verification.md) contains reproduced office results. Frozen evaluation records remain historical; deterministic replay is not fresh inference or independent held-out evidence.
 

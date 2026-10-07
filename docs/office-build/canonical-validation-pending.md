@@ -98,6 +98,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: no real latency/ROI claim; virtual policy observations grant no execution authority. CareerLab remains frozen and isolated.
 - Canonical acceptance: PENDING.
 
-## Phases 15–27
+## Phase 15 — Shadow mode
+
+- Implementation commit: unique `wip(phase-15):` checkpoint; preceding Phase 14 `a58faa3`.
+- Implementation: IMPLEMENTED. Registered human-path comparison, per-step readiness and durable metadata-only synthetic observations with owner/event deduplication.
+- Checks run here: 30 pure tests plus the shadow persistence/owner/deduplication test on both supported Python versions with real PostgreSQL; Ruff and strict typing both targets.
+- Checks not run: real observation capture, canonical readiness calibration, full canonical regression.
+- Environment dependency: explicit shadow migration and disposable PostgreSQL; simulation has no provider handles.
+- Security validation pending: canonical event/path integrity and cross-owner review.
+- Live integration pending: no live workplace feed; human observations grant no authority.
+- Known limitations: matching synthetic traces produce candidate evidence only; all approval/effect steps remain human; no automatic activation or measured real accuracy.
+- Canonical acceptance: PENDING.
+
+## Phases 16–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.
