@@ -11,9 +11,12 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON
   TO actual_runtime;
 GRANT SELECT, INSERT ON deletion_ledger TO actual_runtime;
 GRANT SELECT ON actual_workflow_schema, actual_approval_schema,
-  actual_activation_schema, actual_shadow_schema TO actual_runtime;
+  actual_activation_schema, actual_shadow_schema, actual_team_schema,
+  actual_synthetic_sessions TO actual_runtime;
 GRANT SELECT, INSERT ON actual_workflow_definitions, actual_workflow_audit,
   actual_workflow_dead_letters, actual_effect_audit, actual_activation_audit,
-  actual_shadow_observations, actual_synthetic_provider_receipts TO actual_runtime;
+  actual_shadow_observations, actual_synthetic_provider_receipts,
+  actual_team_audit, actual_shared_workflows TO actual_runtime;
 GRANT SELECT, INSERT, UPDATE ON actual_workflow_runs, actual_effect_approvals,
-  actual_effect_intents, actual_step_activation TO actual_runtime;
+  actual_effect_intents, actual_step_activation,
+  actual_organizations, actual_team_workspaces TO actual_runtime;

@@ -92,13 +92,14 @@ def test_deadline_wakes_waits_reconnect_and_migration_upgrade_preserve_data(pg_e
         connection.execute(
             update(runs).where(runs.c.id == run.id).values(payload=changed.model_dump(mode="json"))
         )
+        connection.exec_driver_sql("ALTER TABLE actual_workflow_runs DROP COLUMN initiator")
     migrate(pg_engine)
     pg_engine.dispose()
     later = Runtime(Store(pg_engine, OWNER), clock=lambda: NOW + timedelta(seconds=901))
     assert later.tick(run.id).failure_code == "deadline_exceeded"
     assert later.tick(run.id).status == "failed"
     with pg_engine.connect() as connection:
-        assert connection.execute(select(version.c.version)).scalar_one() == 2
+        assert connection.execute(select(version.c.version)).scalar_one() == 3
         assert connection.execute(select(dead_letters.c.run)).scalar_one() == run.id
 
 

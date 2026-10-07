@@ -230,6 +230,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: private synthetic rehearsal only; host network is trusted code access, not untrusted-code isolation. OTLP instrumentation is a small manual protocol exporter, not SDK/full tracing/guaranteed audit. TLS probe forwards no API. Old backups cannot authorize redispatch. Version-tag images still require digest and compatibility resolution.
 - Canonical acceptance: PENDING.
 
-## Phases 26–27
+## Phase 26 — Minimal teams
+
+- Implementation commit: unique `wip(phase-26):` checkpoint; preceding Phase 25 `e910f95`.
+- Implementation: IMPLEMENTED synthetic verified-session/current-membership boundary, organization policy/admins, workspace roles, connector references, immutable shared workflows and shared operator/reviewer approvals. Additive workflow migration 3 preserves unassigned legacy runs.
+- Checks run here: 252 workflow/model/deployment unit checks and 52 required PostgreSQL team/approval/runtime/migration/security/role checks on each supported Python version; final 8 team checks on both versions include expired sessions. Ruff, strict typing both targets and frozen audit passed. Existing reliability test was extended to remove the new initiator column before its legacy upgrade. No real identity provider or account is used.
+- Checks not run: remote/browser login, OIDC/SCIM, real session issuance/credential lifecycle, production tenant isolation, team UI or public deployment.
+- Environment dependency: existing PostgreSQL/Python only; explicit team migration 1 and workflow migration 3. Fake sessions/identities are operator-provisioned and synthetic-only.
+- Security validation pending: canonical authorization/tenant/revocation/migration review, protected bootstrap/session audit lifecycle and stronger database isolation against SQL compromise.
+- Live integration pending: real identity, tenant-aware external connector accounts, NEXUS identity/protocol and team deployment.
+- Known limitations: workspace-wide sharing; one enabled execution principal per step. Nullable old initiators cannot enter teams. Shared DB role is not a tenant sandbox. Logout does not withdraw already-granted reviewer approval; explicit revocation/membership/expiry does. Administrators can review; mandatory dual control is not implemented.
+- Canonical acceptance: PENDING.
+
+## Phase 27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.

@@ -13,6 +13,7 @@ from sqlalchemy import (
     String,
     Table,
     UniqueConstraint,
+    inspect,
     select,
     text,
     update,
@@ -21,7 +22,7 @@ from sqlalchemy.dialects.postgresql import JSONB, insert
 from sqlalchemy.engine import RowMapping
 from sqlalchemy.sql.elements import ColumnElement
 
-from actual.core.primitives import WorkspaceId, content_digest
+from actual.core.primitives import ActorId, WorkspaceId, content_digest
 
 from .ir import Workflow, value_type
 from .schema_guard import verify
@@ -44,6 +45,7 @@ runs = Table(
     metadata,
     Column("owner", String(64), primary_key=True),
     Column("id", String(48), primary_key=True),
+    Column("initiator", String(64)),
     Column("workflow", String(48), nullable=False),
     Column("trigger_id", String(48), nullable=False),
     Column("trigger_digest", String(64), nullable=False),
@@ -88,14 +90,20 @@ def migrate(engine: Engine) -> None:
     with engine.begin() as connection:
         connection.execute(text("SELECT pg_advisory_xact_lock(734011001)"))
         metadata.create_all(connection)
-        verify(connection, metadata)
         found = connection.execute(select(version.c.version)).scalars().all()
-        if found and found not in ([1], [2]):
+        if found and found not in ([1], [2], [3]):
             raise Conflict("Unsupported workflow migration version")
+        if found in ([1], [2]):
+            columns = {column["name"] for column in inspect(connection).get_columns(runs.name)}
+            if "initiator" not in columns:
+                connection.execute(
+                    text("ALTER TABLE actual_workflow_runs ADD COLUMN initiator varchar(64)")
+                )
+        verify(connection, metadata)
         if not found:
-            connection.execute(version.insert().values(version=2))
-        elif found == [1]:
-            connection.execute(update(version).values(version=2))
+            connection.execute(version.insert().values(version=3))
+        elif found in ([1], [2]):
+            connection.execute(update(version).values(version=3))
 
 
 def decode(payload: object) -> Run:
@@ -118,6 +126,7 @@ class Store:
             or run.id != row["id"]
             or run.revision != row["revision"]
             or run.trigger_id != row["trigger_id"]
+            or (run.initiator.root if run.initiator is not None else None) != row["initiator"]
             or content_digest(tuple(v.model_dump(mode="json") for v in run.trigger))
             != row["trigger_digest"]
         ):
@@ -149,7 +158,13 @@ class Store:
         return self._definition(row, digest)
 
     def start(
-        self, workflow: Workflow, trigger_id: str, values: tuple[Value, ...], now: datetime
+        self,
+        workflow: Workflow,
+        trigger_id: str,
+        values: tuple[Value, ...],
+        now: datetime,
+        *,
+        principal: ActorId | None = None,
     ) -> Run:
         workflow = Workflow.model_validate(workflow)
         expected = {item.name: item.type for item in workflow.trigger_schema}
@@ -162,6 +177,7 @@ class Store:
         run = Run(
             id="run_" + uuid4().hex,
             workspace_id=WorkspaceId(self.owner),
+            initiator=principal,
             definition_digest=workflow.digest,
             trigger_id=trigger_id,
             trigger=values,
@@ -195,6 +211,7 @@ class Store:
                 .values(
                     owner=self.owner,
                     id=run.id,
+                    initiator=run.initiator.root if run.initiator is not None else None,
                     workflow=workflow.id,
                     trigger_id=trigger_id,
                     trigger_digest=digest,
@@ -219,7 +236,10 @@ class Store:
             )
             if row["trigger_digest"] != digest:
                 raise Conflict("Trigger identity reused with different input")
-            return self._run(row)
+            recorded_run = self._run(row)
+            if recorded_run.initiator != principal:
+                raise Conflict("Trigger execution principal changed")
+            return recorded_run
 
     def load(self, identifier: str) -> Run:
         with self.engine.connect() as connection:
@@ -274,6 +294,7 @@ class Store:
         if (
             changed.id,
             changed.workspace_id,
+            changed.initiator,
             changed.definition_digest,
             changed.trigger,
             changed.trigger_id,
@@ -282,6 +303,7 @@ class Store:
         ) != (
             old.id,
             old.workspace_id,
+            old.initiator,
             old.definition_digest,
             old.trigger,
             old.trigger_id,

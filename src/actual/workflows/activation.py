@@ -82,9 +82,20 @@ def migrate(engine: Engine) -> None:
 
 
 class ActivationStore:
-    def __init__(self, engine: Engine, owner: WorkspaceId, actor: ActorId, permission: Authorizer):
+    def __init__(
+        self,
+        engine: Engine,
+        owner: WorkspaceId,
+        actor: ActorId,
+        permission: Authorizer,
+        *,
+        principal: ActorId | None = None,
+        policy_version: int = 1,
+    ):
         self.engine, self.owner = engine, WorkspaceId.model_validate(owner)
         self.actor, self.permission = ActorId.model_validate(actor), permission
+        self.principal = ActorId.model_validate(principal if principal is not None else actor)
+        self.policy_version = policy_version
 
     def set(
         self,
@@ -112,7 +123,8 @@ class ActivationStore:
         )
         access = Access(
             workspace_id=self.owner,
-            principal_id=self.actor,
+            principal_id=self.principal,
+            policy_version=self.policy_version,
             capability=name,
             resource="synthetic_inbox" if step.capability == "fake_write" else "synthetic_record",
             workflow_digest=workflow.digest,
@@ -125,7 +137,7 @@ class ActivationStore:
             step=step.id,
             capability=name,
             state=state,
-            principal=self.actor,
+            principal=self.principal,
             evidence_digest=digest,
             revision=expected_revision + 1,
         )
@@ -173,7 +185,7 @@ class ActivationStore:
     def allows(self, access: Access) -> bool:
         if (
             access.workspace_id != self.owner
-            or access.principal_id != self.actor
+            or access.principal_id != self.principal
             or access.workflow_digest is None
             or access.step is None
         ):

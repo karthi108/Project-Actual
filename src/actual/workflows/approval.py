@@ -213,10 +213,19 @@ class ApprovalService:
     """Actor and authorizer are installed by the trusted local application boundary."""
 
     def __init__(
-        self, store: Store, actor: ActorId, authorizer: Authorizer, policy_version: int = 1
+        self,
+        store: Store,
+        actor: ActorId,
+        authorizer: Authorizer,
+        policy_version: int = 1,
+        *,
+        principal: ActorId | None = None,
+        approval_authority: Callable[[Approval], bool] = lambda approval: True,
     ):
         self.store, self.actor, self.authorizer = store, ActorId.model_validate(actor), authorizer
         self.policy_version = policy_version
+        self.principal = ActorId.model_validate(principal if principal is not None else actor)
+        self.approval_authority = approval_authority
 
     def _locked(self, connection: Connection, identifier: str, revision: int) -> Run:
         row = (
@@ -254,7 +263,7 @@ class ApprovalService:
             return self.authorizer.allows(
                 Access(
                     workspace_id=run.workspace_id,
-                    principal_id=self.actor,
+                    principal_id=self.principal,
                     capability="fake_write",
                     resource=payload.destination,
                     policy_version=self.policy_version,
@@ -277,7 +286,7 @@ class ApprovalService:
             step,
             payload,
             BusinessIntent.model_validate(business),
-            self.actor,
+            self.principal,
             self.policy_version,
         )
         if not self.authorizer.allows(binding.access()):
@@ -479,7 +488,7 @@ class Dispatcher:
             step,
             request(values),
             approval.binding.business,
-            self.service.actor,
+            self.service.principal,
             self.service.policy_version,
         )
         if (
@@ -487,6 +496,7 @@ class Dispatcher:
             or approval.id != record["id"]
             or approval.expires_at <= now
             or approval.binding != binding
+            or not self.service.approval_authority(approval)
             or not self.service.authorizer.allows(binding.access())
         ):
             raise ToolError("denied")

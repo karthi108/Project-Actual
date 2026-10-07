@@ -115,10 +115,17 @@ class FakeReader:
 
 
 class ReadConnector:
-    def __init__(self, provider: ReadPort, principal: ActorId, authorizer: Authorizer):
+    def __init__(
+        self,
+        provider: ReadPort,
+        principal: ActorId,
+        authorizer: Authorizer,
+        policy_version: int = 1,
+    ):
         self.provider = provider
         self.principal = ActorId.model_validate(principal)
         self.authorizer = authorizer
+        self.policy_version = policy_version
 
     def execute(self, run: Run, step: Step, values: tuple[Value, ...]) -> tuple[Value, ...]:
         if step.capability != "fake_read" or step.effect != "READ_ONLY":
@@ -133,6 +140,7 @@ class ReadConnector:
             workspace_id=run.workspace_id,
             principal_id=self.principal,
             capability="fake_read",
+            policy_version=self.policy_version,
             resource=request.resource,
             workflow_digest=run.definition_digest,
             step=step.id,

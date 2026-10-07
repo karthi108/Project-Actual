@@ -15,6 +15,7 @@ from actual.persistence.database import create_database_engine, verify_schema
 from actual.workflows.activation import migrate as migrate_activation
 from actual.workflows.approval import migrate as migrate_approval
 from actual.workflows.storage import migrate as migrate_workflow
+from actual.workflows.teams import migrate as migrate_teams
 from actual.worklab.shadow import migrate as migrate_shadow
 
 from .secrets import database_url
@@ -34,6 +35,7 @@ def run(action: str) -> None:
                 migrate_approval,
                 migrate_activation,
                 migrate_shadow,
+                migrate_teams,
             ):
                 migration(engine)
         elif action == "check":

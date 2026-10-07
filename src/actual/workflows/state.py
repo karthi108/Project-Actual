@@ -4,7 +4,7 @@ from typing import Annotated, Literal
 
 from pydantic import Field
 
-from actual.core.primitives import Contract, Digest, Instant, WorkspaceId
+from actual.core.primitives import ActorId, Contract, Digest, Instant, WorkspaceId
 
 from .ir import Name, Scalar
 
@@ -30,6 +30,7 @@ class Run(Contract):
     runtime_version: Literal["actual-runtime-v1"] = "actual-runtime-v1"
     id: Name
     workspace_id: WorkspaceId
+    initiator: ActorId | None = None
     definition_digest: Digest
     trigger_id: Name
     trigger: Annotated[tuple[Value, ...], Field(max_length=8)]
