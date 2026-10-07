@@ -122,6 +122,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: operator-reviewed synthetic evidence can contain disagreements and never auto-activates; activated writes retain per-action human approval. AI integration remains unavailable. Use `controlled(...)` for application fake execution.
 - Canonical acceptance: PENDING.
 
-## Phases 17–27
+## Phase 17 — Teach Mode
+
+- Implementation commit: unique `wip(phase-17):` checkpoint; preceding Phase 16 `8fbf723`.
+- Implementation: IMPLEMENTED synthetic semantic-session/display/privacy harness. Real capture/UI integration pending.
+- Checks run here: 37 pure tests on both Python versions, Ruff, strict typing both targets; visible console demo exercises start/pause/resume/stop with one fabricated event. Allow/deny rules, password/sensitive exclusion, raw-field rejection, visibility, deduplication and deletion tested.
+- Checks not run: device/browser extension recording, persistent graphical UI/accessibility or private office capture; no such capture occurs.
+- Environment dependency: Python only; no capture dependency installed.
+- Security validation pending: canonical permission/display loss, classification/retention and real adapter privacy review.
+- Live integration pending: native/browser-extension input, UI, personal-environment observation archive.
+- Known limitations: transient event tuple, one observed example per session, no automatic archive or process completeness claim; labels cannot detect deliberately mislabeled private input. No secure erasure guarantee.
+- Canonical acceptance: PENDING.
+
+## Phases 18–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.
