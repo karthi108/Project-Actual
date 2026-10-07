@@ -1,0 +1,5 @@
+minimumReleaseAge: 10080
+minimumReleaseAgeStrict: true
+storeDir: ../../local-data/pnpm-store
+saveExact: true
+ignoreScripts: true

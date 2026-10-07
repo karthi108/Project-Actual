@@ -12,6 +12,8 @@ Start with [the engineering contract](docs/phase-0/engineering-contract.md), [pr
 
 ## Contract map
 
+The [Phase-8 career interface](docs/phase-8/README.md) is implemented and office verified, with canonical acceptance pending. It uses the existing synthetic API for jobs, evidence review/withdrawal and application tracking. Start its loopback frontend from `apps/web` after configuring an isolated synthetic API/database; no real-data access or external submission is enabled.
+
 | Document | Responsibility |
 | --- | --- |
 | [Engineering contract](docs/phase-0/engineering-contract.md) | Problem, users, exact v0.1 scope, non-goals, first scenario and journey |
