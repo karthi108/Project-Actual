@@ -1,0 +1,151 @@
+"""One durable bounded step at a time; no background service or effect executor."""
+
+from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
+from typing import Protocol
+
+from .ir import Step, Workflow
+from .state import Output, Progress, Run, Value
+from .storage import Store
+
+
+class Policy(Protocol):
+    def allows(self, run: Run, workflow: Workflow, step: Step) -> bool: ...
+
+
+class Deny:
+    def allows(self, run: Run, workflow: Workflow, step: Step) -> bool:
+        return False
+
+
+def inputs(run: Run, step: Step) -> tuple[Value, ...]:
+    result: list[Value] = []
+    for binding in step.inputs:
+        if binding.source == "literal":
+            assert binding.value is not None
+            value = binding.value
+        else:
+            source = (
+                run.trigger
+                if binding.source == "trigger"
+                else next(output.values for output in run.outputs if output.step == binding.step)
+            )
+            value = next(item.value for item in source if item.name == binding.field)
+        result.append(Value(name=binding.name, value=value))
+    return tuple(result)
+
+
+def route(
+    workflow: Workflow, run: Run, outcome: str, now: datetime, values: tuple[Value, ...] = ()
+) -> Run:
+    target = next(
+        edge.target
+        for edge in workflow.edges
+        if edge.source == run.current and edge.outcome == outcome
+    )
+    return run.model_copy(
+        update={
+            "current": target,
+            "status": "ready",
+            "due_at": None,
+            "attempts": 0,
+            "executions": run.executions + 1,
+            "revision": run.revision + 1,
+            "progress": (
+                *run.progress,
+                Progress(
+                    step=run.current, attempt=max(1, run.attempts + 1), outcome=outcome, at=now
+                ),
+            ),
+            "outputs": (*run.outputs, Output(step=run.current, values=values))
+            if values
+            else run.outputs,
+        }
+    )
+
+
+class Runtime:
+    def __init__(
+        self,
+        store: Store,
+        policy: Policy | None = None,
+        clock: Callable[[], datetime] = lambda: datetime.now(UTC),
+    ):
+        self.store, self.policy, self.clock = store, policy or Deny(), clock
+
+    def tick(self, identifier: str) -> Run:
+        now = self.clock()
+        claim = self.store.claim(identifier, now)
+        if claim is None:
+            return self.store.load(identifier)
+        run, fence = claim
+        workflow = self.store.definition(run.definition_digest)
+        step = next(item for item in workflow.steps if item.id == run.current)
+        if run.executions >= workflow.max_steps or now >= run.started_at + timedelta(
+            seconds=workflow.max_duration_seconds
+        ):
+            changed = run.model_copy(update={"status": "failed", "revision": run.revision + 1})
+        elif step.kind == "terminate":
+            changed = run.model_copy(update={"status": step.terminal, "revision": run.revision + 1})
+        elif step.kind in ("wait", "human_approval"):
+            if run.due_at is None:
+                changed = run.model_copy(
+                    update={
+                        "status": "waiting" if step.kind == "wait" else "human_wait",
+                        "due_at": now
+                        + timedelta(
+                            seconds=(
+                                step.wait_seconds if step.kind == "wait" else step.timeout_seconds
+                            )
+                        ),
+                        "revision": run.revision + 1,
+                    }
+                )
+            else:
+                changed = route(workflow, run, "success" if step.kind == "wait" else "timeout", now)
+        elif step.kind == "trigger":
+            changed = route(workflow, run, "success", now)
+        elif step.kind == "policy":
+            changed = route(
+                workflow, run, "allow" if self.policy.allows(run, workflow, step) else "deny", now
+            )
+        elif step.kind == "branch":
+            changed = route(workflow, run, "true" if inputs(run, step)[0].value else "false", now)
+        else:
+            values: tuple[Value, ...] = ()
+            if step.kind == "deterministic":
+                supplied = inputs(run, step)[0].value
+                values = (
+                    (Value(name="text", value=supplied),)
+                    if step.capability == "copy_text"
+                    else (Value(name="value", value=bool(str(supplied).strip())),)
+                )
+            if values:
+                changed = route(workflow, run, "success", now, values)
+            elif run.attempts + 1 < step.retry.attempts:
+                changed = run.model_copy(
+                    update={
+                        "status": "waiting",
+                        "attempts": run.attempts + 1,
+                        "executions": run.executions + 1,
+                        "revision": run.revision + 1,
+                        "due_at": now
+                        + timedelta(seconds=min(300, step.retry.backoff_seconds * 2**run.attempts)),
+                        "progress": (
+                            *run.progress,
+                            Progress(
+                                step=step.id,
+                                attempt=run.attempts + 1,
+                                outcome="unavailable",
+                                at=now,
+                            ),
+                        ),
+                    }
+                )
+            else:
+                changed = route(workflow, run, "error", now)
+        finished = self.clock()
+        if finished >= now + timedelta(seconds=step.timeout_seconds):
+            # Pure computation can be repeated after lease expiry, never committed late.
+            return self.store.load(identifier)
+        return self.store.finish(run, fence, changed, finished)

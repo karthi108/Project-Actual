@@ -48,6 +48,19 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: scalar schemas, fixed catalog, acyclic graphs; no arbitrary expressions/code or loops. Conservative static duration budget counts all branches.
 - Canonical acceptance: PENDING.
 
-## Phases 11–27
+## Phase 11 — Persisted workflow runtime
+
+- Implementation commit: unique `wip(phase-11):` checkpoint; preceding Phase 10 `a6f8900`.
+- Implementation: IMPLEMENTED. Separate explicitly migrated PostgreSQL workflow tables, immutable definitions, stable trigger deduplication, fenced leases, durable waits/retries, cancellation and atomic progress/audit.
+- Checks run here: 22 graph/runtime tests passed on each Python 3.13.13 and 3.14.4 with real disposable PostgreSQL 18.6, zero skips; strict mypy (92 files and both workflow targets), Ruff, CareerLab current-environment verification and frozen artifact audit.
+- Failed attempts preserved: earlier full regression was interrupted before completion and is unverified; sandbox initdb failed to create a restricted token; focused checks initially used an abbreviated Alembic head in an assertion, corrected to the exact preserved accepted head. The corrected dual-Python run passed. Phase-10 static-duration validation initially referenced a missing field; that field was added before its successful checkpoint checks.
+- Checks not run: full Python regression repeated to completion at this checkpoint, Docker runtime, canonical long-lived worker/migration review. Available checks used fresh native PostgreSQL and cleaned up their owned cluster.
+- Environment dependency: explicit disposable PostgreSQL URL and supported Python; operator migration, never startup DDL. Office configuration manifest is separate from frozen accepted manifests and preserves all eight record hashes.
+- Security validation pending: canonical concurrency, migration, audit/lease and cross-owner adversarial review.
+- Live integration pending: no tools, positive effect approval or live model execution in this checkpoint. Those capabilities have separate later gates.
+- Known limitations: single DAG cursor, bounded scalar payload, no background scheduler. Lease fencing protects local progress; remote effect safety requires a distinct durable intent protocol.
+- Canonical acceptance: PENDING.
+
+## Phases 12–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.
