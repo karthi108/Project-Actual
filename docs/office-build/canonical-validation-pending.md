@@ -110,6 +110,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: matching synthetic traces produce candidate evidence only; all approval/effect steps remain human; no automatic activation or measured real accuracy.
 - Canonical acceptance: PENDING.
 
-## Phases 16–27
+## Phase 16 — Controlled personal activation architecture
+
+- Implementation commit: unique `wip(phase-16):` checkpoint; preceding Phase 15 `3e3d15f`.
+- Implementation: IMPLEMENTED for synthetic connectors only. Reviewed step/capability activation, immutable workflow pins, revision/audit and controlled composition combining current permission, activation and exact action approval.
+- Checks run here: 30 pure checks plus 2 real-PostgreSQL activation tests on both supported Python versions; Ruff, strict typing both targets. Missing activation, stale revision/evidence, changed workflow, revoked permission and disable-after-approval deny. Literal narrowing was corrected before clean typing checks.
+- Checks not run: personal-account activation, authenticated activation UI, full canonical regression.
+- Environment dependency: explicit activation migration and existing Python/PostgreSQL; no credentials.
+- Security validation pending: canonical composition/activation/revocation review. Low-level contract-test ports are not a public authenticated product boundary.
+- Live integration pending: every real personal connector; no office account is activated.
+- Known limitations: operator-reviewed synthetic evidence can contain disagreements and never auto-activates; activated writes retain per-action human approval. AI integration remains unavailable. Use `controlled(...)` for application fake execution.
+- Canonical acceptance: PENDING.
+
+## Phases 17–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.

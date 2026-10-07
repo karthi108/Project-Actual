@@ -132,6 +132,8 @@ class ReadConnector:
             principal_id=self.principal,
             capability="fake_read",
             resource=request.resource,
+            workflow_digest=run.definition_digest,
+            step=step.id,
         )
         if not self.authorizer.allows(access):
             raise ToolError("denied")
