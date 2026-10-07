@@ -194,6 +194,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: proposed synthetic loopback protocol only; no cached approval or fallback allow on failure. Models cannot choose destinations or confer authority.
 - Canonical acceptance: PENDING.
 
-## Phases 23–27
+## Phase 23 — Reliability hardening
+
+- Implementation commit: unique `wip(phase-23):` checkpoint; preceding Phase 22 `3dae58f`.
+- Implementation: IMPLEMENTED. Additive workflow migration 2/dead letters, overdue-wait deadline recovery, stable bounded jitter, explicit failure codes and successful-read error clearing.
+- Checks run here: 236 workflow/accepted-model checks and 29 real-PostgreSQL workflow/approval/activation/shadow/reliability checks on each supported Python version; final 7 reliability cases on both versions start from the actual older schema; Ruff, strict typing both targets and frozen artifact audit. Model faults use accepted test doubles, not live Qwen. Negative-power typing finding corrected to bounded integer shifts.
+- Checks not run: process-kill/network partition campaign, long-lived DB outage, real provider/OAuth/idempotency expiry/rate limits, canonical operational recovery.
+- Environment dependency: disposable PostgreSQL/Python; explicit workflow migration 2, accepted Career migration unchanged.
+- Security validation pending: canonical fault/recovery/lease/migration audit.
+- Live integration pending: all real provider semantics and OAuth. Workflow AI declarations remain unavailable; accepted gateway timeout/malformed tests remain independent.
+- Known limitations: uncertain dispatch reconciles without resend; no automatic unsend/compensation. A compensating action requires its own reviewed intent. Dead letters preserve failure metadata and do not automatically reactivate a run.
+- Canonical acceptance: PENDING.
+
+## Phases 24–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.

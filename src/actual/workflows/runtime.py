@@ -4,6 +4,7 @@ from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from typing import Literal, Protocol
 
+from .backoff import delay
 from .connectors import ReadConnector, ToolError
 from .deterministic import execute as deterministic
 from .ir import Step, Workflow
@@ -106,9 +107,25 @@ class Runtime:
         if run.executions >= workflow.max_steps or now >= run.started_at + timedelta(
             seconds=workflow.max_duration_seconds
         ):
-            changed = run.model_copy(update={"status": "failed", "revision": run.revision + 1})
+            changed = run.model_copy(
+                update={
+                    "status": "failed",
+                    "revision": run.revision + 1,
+                    "failure_code": "budget_exhausted"
+                    if run.executions >= workflow.max_steps
+                    else "deadline_exceeded",
+                }
+            )
         elif step.kind == "terminate":
-            changed = run.model_copy(update={"status": step.terminal, "revision": run.revision + 1})
+            changed = run.model_copy(
+                update={
+                    "status": step.terminal,
+                    "revision": run.revision + 1,
+                    "failure_code": (run.failure_code or "workflow_failed")
+                    if step.terminal == "failed"
+                    else run.failure_code,
+                }
+            )
         elif step.kind in ("wait", "human_approval"):
             if run.due_at is None:
                 changed = run.model_copy(
@@ -125,12 +142,15 @@ class Runtime:
                 )
             else:
                 changed = route(workflow, run, "success" if step.kind == "wait" else "timeout", now)
+                if step.kind == "human_approval":
+                    changed = changed.model_copy(update={"failure_code": "approval_timeout"})
         elif step.kind == "trigger":
             changed = route(workflow, run, "success", now)
         elif step.kind == "policy":
-            changed = route(
-                workflow, run, "allow" if self.policy.allows(run, workflow, step) else "deny", now
-            )
+            permitted = self.policy.allows(run, workflow, step)
+            changed = route(workflow, run, "allow" if permitted else "deny", now)
+            if not permitted:
+                changed = changed.model_copy(update={"failure_code": "policy_denied"})
         elif step.kind == "branch":
             changed = route(workflow, run, "true" if inputs(run, step)[0].value else "false", now)
         else:
@@ -154,7 +174,9 @@ class Runtime:
                 except ToolError as failure:
                     error, retryable = failure.code, failure.retryable
             if values:
-                changed = route(workflow, run, "success", now, values)
+                changed = route(workflow, run, "success", now, values).model_copy(
+                    update={"failure_code": None}
+                )
             elif retryable and run.attempts + 1 < step.retry.attempts:
                 changed = run.model_copy(
                     update={
@@ -163,7 +185,13 @@ class Runtime:
                         "executions": run.executions + 1,
                         "revision": run.revision + 1,
                         "due_at": now
-                        + timedelta(seconds=min(300, step.retry.backoff_seconds * 2**run.attempts)),
+                        + timedelta(
+                            seconds=delay(
+                                step.retry.backoff_seconds,
+                                run.attempts,
+                                f"{run.id}:{step.id}:{run.attempts}",
+                            )
+                        ),
                         "progress": (
                             *run.progress,
                             Progress(

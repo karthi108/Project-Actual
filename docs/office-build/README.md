@@ -22,7 +22,8 @@ Each phase has a separate WIP checkpoint. The implementation commit is located b
 | 20 | Implemented; evidence-linked improvement proposals | 51 pure checks on both Python versions, typing and Ruff | PENDING |
 | 21 | Implemented; meeting-action and email-triage families | 54 pure checks on both Python versions, unchanged original definition, typing and Ruff | PENDING |
 | 22 | Implemented ACTUAL-side proposed NEXUS adapter; real interoperability pending | 67 pure checks on both Python versions, fail-closed protocol harness, typing and Ruff | PENDING |
-| 23–27 | Development continues in roadmap order | Recorded at each checkpoint | PENDING |
+| 23 | Implemented; bounded jitter, deadline recovery and dead letters | 236 workflow/model checks and 29 workflow database checks on both Python versions; final 7 reliability checks, typing and Ruff | PENDING |
+| 24–27 | Development continues in roadmap order | Recorded at each checkpoint | PENDING |
 
 [Validation debt](canonical-validation-pending.md) records actual checks and outstanding personal-environment validation. [Phase-7 verification](../phase-7/migration-verification.md) contains reproduced office results. Frozen evaluation records remain historical; deterministic replay is not fresh inference or independent held-out evidence.
 

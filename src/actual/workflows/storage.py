@@ -62,6 +62,17 @@ audit = Table(
     Column("status", String(48), nullable=False),
     Column("definition_digest", String(64), nullable=False),
 )
+dead_letters = Table(
+    "actual_workflow_dead_letters",
+    metadata,
+    Column("owner", String(64), primary_key=True),
+    Column("run", String(48), primary_key=True),
+    Column("definition_digest", String(64), nullable=False),
+    Column("revision", Integer, nullable=False),
+    Column("step", String(48), nullable=False),
+    Column("code", String(48), nullable=False),
+    Column("at", DateTime(timezone=True), nullable=False),
+)
 
 
 class Conflict(Exception):
@@ -76,10 +87,12 @@ def migrate(engine: Engine) -> None:
         connection.execute(text("SELECT pg_advisory_xact_lock(734011001)"))
         metadata.create_all(connection)
         found = connection.execute(select(version.c.version)).scalars().all()
-        if found and found != [1]:
+        if found and found not in ([1], [2]):
             raise Conflict("Unsupported workflow migration version")
         if not found:
-            connection.execute(version.insert().values(version=1))
+            connection.execute(version.insert().values(version=2))
+        elif found == [1]:
+            connection.execute(update(version).values(version=2))
 
 
 def decode(payload: object) -> Run:
@@ -200,8 +213,6 @@ class Store:
                 return None
             if row["lease_until"] is not None and row["lease_until"] > now:
                 return None
-            if run.due_at is not None and run.due_at > now:
-                return None
             workflow = Workflow.model_validate_json(
                 json.dumps(
                     connection.execute(
@@ -212,6 +223,14 @@ class Store:
                     ).scalar_one()
                 )
             )
+            if workflow.digest != run.definition_digest:
+                raise Conflict("Definition digest mismatch")
+            if (
+                run.due_at is not None
+                and run.due_at > now
+                and now < run.started_at + timedelta(seconds=workflow.max_duration_seconds)
+            ):
+                return None
             step = next(item for item in workflow.steps if item.id == run.current)
             fence = row["fence"] + 1
             connection.execute(
@@ -274,6 +293,20 @@ class Store:
                     definition_digest=old.definition_digest,
                 )
             )
+            if changed.status == "failed":
+                connection.execute(
+                    insert(dead_letters)
+                    .values(
+                        owner=self.owner,
+                        run=old.id,
+                        definition_digest=old.definition_digest,
+                        revision=changed.revision,
+                        step=old.current,
+                        code=changed.failure_code or "workflow_failed",
+                        at=now,
+                    )
+                    .on_conflict_do_nothing()
+                )
         return changed
 
     def cancel(self, identifier: str, revision: int, now: datetime) -> Run:

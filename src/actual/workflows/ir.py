@@ -7,6 +7,8 @@ from pydantic import Field, model_validator
 from actual.core.primitives import Contract, content_digest
 from actual.core.workflow import EffectKind
 
+from .backoff import maximum as maximum_backoff
+
 type Name = Annotated[str, Field(pattern=r"^[a-z][a-z0-9_]{0,47}$", strict=True)]
 type Scalar = Annotated[str, Field(max_length=4096)] | bool | int
 type ValueType = Literal["text", "boolean", "integer"]
@@ -348,7 +350,10 @@ class Workflow(Contract):
                 step.wait_seconds
                 if step.kind == "wait"
                 else step.timeout_seconds * step.retry.attempts
-                + step.retry.backoff_seconds * (2 ** (step.retry.attempts - 1) - 1)
+                + sum(
+                    maximum_backoff(step.retry.backoff_seconds, attempt)
+                    for attempt in range(step.retry.attempts - 1)
+                )
                 for step in self.steps
             )
             > self.max_duration_seconds
