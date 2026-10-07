@@ -182,6 +182,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: notes must be structured synthetic tokens; no inferred tasks/dates or facts. Subject classification is a tiny deterministic prefix rule; human-review disposition is not completion of human work.
 - Canonical acceptance: PENDING.
 
-## Phases 22–27
+## Phase 22 — NEXUS integration boundary
+
+- Implementation commit: unique `wip(phase-22):` checkpoint; preceding Phase 21 `6f35e06`.
+- Implementation: IMPLEMENTED ACTUAL-side proposed request/decision protocol, local-policy alias and synthetic loopback adapter; real NEXUS interoperability PENDING_CANONICAL_INTEGRATION.
+- Checks run here: 67 pure checks on both supported Python versions, Ruff and strict typing both targets. Mock protocol validates exact context, digest/request ID/version/expiry, malformed/oversized/redirect responses, 429/500 and timeout denial.
+- Checks not run: actual NEXUS service/protocol, identity/TLS, remote audit/revocation semantics or credentials.
+- Environment dependency: existing pinned httpx2, Python; no service started, new dependency or secret introduced.
+- Security validation pending: canonical protocol/service identity, decision audit persistence and real revocation timing. Last-decision metadata is diagnostic, not a concurrency-safe audit ledger.
+- Live integration pending: NEXUS repository/service and agreed real protocol.
+- Known limitations: proposed synthetic loopback protocol only; no cached approval or fallback allow on failure. Models cannot choose destinations or confer authority.
+- Canonical acceptance: PENDING.
+
+## Phases 23–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.

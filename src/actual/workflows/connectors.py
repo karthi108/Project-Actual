@@ -4,7 +4,7 @@ from typing import Annotated, Literal, Protocol
 
 from pydantic import Field, ValidationError
 
-from actual.core.primitives import ActorId, Contract, Digest, WorkspaceId
+from actual.core.primitives import ActorId, Contract, Digest, WorkspaceId, content_digest
 
 from .ir import Name, Step
 from .state import Run, Value
@@ -134,6 +134,7 @@ class ReadConnector:
             resource=request.resource,
             workflow_digest=run.definition_digest,
             step=step.id,
+            arguments_digest=content_digest(request.model_dump(mode="json")),
         )
         if not self.authorizer.allows(access):
             raise ToolError("denied")
