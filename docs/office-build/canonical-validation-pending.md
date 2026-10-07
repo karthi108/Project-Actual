@@ -86,6 +86,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: short synthetic human wait; no approval UI or daemon; unknown outcomes require read-only reconciliation and never automatic resend. Cancellation after the committed dispatch marker cannot undo remote acceptance. Append-oriented audit is not administrator-proof.
 - Canonical acceptance: PENDING.
 
-## Phases 14–27
+## Phase 14 — Historical replay
+
+- Implementation commit: unique `wip(phase-14):` checkpoint; preceding Phase 13 `28ea4a2`.
+- Implementation: IMPLEMENTED. Same-runtime transient replay, virtual time, provider-handle/dispatch mode guards, five synthetic WorkLab observations and separate evaluator answers.
+- Checks run here: 26 pure tests on both Python versions; strict typing both targets, Ruff; development evaluator reports 5/5 expected-status and branch matches, 2 completions, 1 escalation, 2 deliberate failures and zero provider calls. A typing finding in narrowed branch outcomes was corrected before clean checks.
+- Checks not run: canonical historical/live datasets, real-time performance, inference or held-out accuracy. AI claim correctness is unmeasured, not reported as zero defects.
+- Environment dependency: Python only. No service, provider or model is acquired by replay.
+- Security validation pending: canonical replay/shadow effect-isolation review.
+- Live integration pending: none claimed; shared public synthetic observations are development examples only.
+- Known limitations: no real latency/ROI claim; virtual policy observations grant no execution authority. CareerLab remains frozen and isolated.
+- Canonical acceptance: PENDING.
+
+## Phases 15–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.

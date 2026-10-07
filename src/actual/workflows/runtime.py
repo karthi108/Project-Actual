@@ -2,12 +2,18 @@
 
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
-from typing import Protocol
+from typing import Literal, Protocol
 
 from .connectors import ReadConnector, ToolError
 from .ir import Step, Workflow
 from .state import Output, Progress, Run, Value
-from .storage import Store
+
+
+class RuntimeStore(Protocol):
+    def load(self, identifier: str) -> Run: ...
+    def claim(self, identifier: str, now: datetime) -> tuple[Run, int] | None: ...
+    def definition(self, digest: str) -> Workflow: ...
+    def finish(self, old: Run, fence: int, changed: Run, now: datetime) -> Run: ...
 
 
 class Policy(Protocol):
@@ -74,15 +80,19 @@ def route(
 class Runtime:
     def __init__(
         self,
-        store: Store,
+        store: RuntimeStore,
         policy: Policy | None = None,
         clock: Callable[[], datetime] = lambda: datetime.now(UTC),
         connector: ReadConnector | None = None,
         effects: EffectExecutor | None = None,
+        mode: Literal["synthetic", "replay", "shadow"] = "synthetic",
     ):
+        if mode != "synthetic" and (connector is not None or effects is not None):
+            raise ValueError("Replay/shadow cannot acquire provider handles")
         self.store, self.policy, self.clock = store, policy or Deny(), clock
         self.connector = connector
         self.effects = effects
+        self.mode = mode
 
     def tick(self, identifier: str) -> Run:
         now = self.clock()
@@ -125,7 +135,9 @@ class Runtime:
         else:
             values: tuple[Value, ...] = ()
             error, retryable = "unavailable", True
-            if step.kind == "deterministic":
+            if step.kind in ("ai", "tool") and self.mode != "synthetic":
+                error, retryable = "mode_denied", False
+            elif step.kind == "deterministic":
                 supplied = inputs(run, step)[0].value
                 values = (
                     (Value(name="text", value=supplied),)
