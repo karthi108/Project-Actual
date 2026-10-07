@@ -146,6 +146,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: repeated observed activities are returns/rework, not executable loops; elapsed gaps are not active work, causal delay or ROI. Missing events and branches cannot be inferred into completeness.
 - Canonical acceptance: PENDING.
 
-## Phases 19–27
+## Phase 19 — Voice Teach Mode
+
+- Implementation commit: unique `wip(phase-19):` checkpoint; preceding Phase 18 `a2a9191`.
+- Implementation: IMPLEMENTED synthetic transcript/local-STT-port harness and exact candidate confirmation. Real recording/recognizer integration pending.
+- Checks run here: 48 pure tests on both supported Python versions, Ruff and strict typing both targets. Active display/session/event binding, privacy abstention, malicious/unknown explanations, duplicate/conflicting identity and human-claim/authority separation passed.
+- Checks not run: real microphone/audio, local recognizer/model accuracy, private voice capture or persistent voice UI.
+- Environment dependency: Python only; no recognizer/model or paid inference installed.
+- Security validation pending: canonical audio permission/retention, classifier/filter limits and real-device privacy review.
+- Live integration pending: personal device and a verified local STT backend. Fake fixture transcription is not an audio recognition claim.
+- Known limitations: deterministic phrase catalog; unrecognized explanation requires manual review. Confirmation preserves human-claim provenance and never grants policy/permission/approval. No raw transcript/audio retained by candidate storage.
+- Canonical acceptance: PENDING.
+
+## Phases 20–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.
