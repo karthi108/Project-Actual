@@ -29,7 +29,7 @@ actual-model-probe = "actual.models.__main__:main"
 dev = ["pytest==9.1.1", "ruff==0.16.10", "mypy==2.4.0"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests/careerlab", "tests/core", "tests/profile", "tests/persistence", "tests/application", "tests/api", "tests/models", "tests/intelligence"]
+testpaths = ["tests/careerlab", "tests/core", "tests/profile", "tests/persistence", "tests/application", "tests/api", "tests/models", "tests/intelligence", "tests/workflows"]
 pythonpath = ["src"]
 addopts = "-ra --strict-config --strict-markers --basetemp=.pytest-tmp-careerlab"
 

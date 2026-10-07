@@ -37,6 +37,17 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: UI comparison accepts one quote, API up to eight; dependency-changing edits require explicit reconciliation and are rejected while prepared references depend on them. Content review is not external-action approval.
 - Canonical acceptance: PENDING.
 
-## Phases 10–27
+## Phase 10 — Typed Workflow IR
+
+- Implementation commit: unique `wip(phase-10):` checkpoint subject; preceding Phase 9 `8e69625`.
+- Implementation: IMPLEMENTED; closed synthetic DAG, capability schemas/metadata, typed bindings, outcome completeness, reachability, budgets and successful gate dominance.
+- Checks run here: 15 graph/schema/adversarial tests on Python 3.13 and 3.14; Ruff; strict mypy; schema/example roundtrip; frozen-artifact check. First check found workflow version incompatible with the core contract; added a separate explicit IR version without modifying the accepted core schema.
+- Checks not run: canonical personal-environment full regression. No execution or external integration in this phase.
+- Security validation pending: canonical graph authority/adversarial audit. Declared effects and permissions grant no authority.
+- Live integration pending: runtime, connectors and exact effect approval are subsequent phases. AI step is declarative, with no invocation.
+- Known limitations: scalar schemas, fixed catalog, acyclic graphs; no arbitrary expressions/code or loops. Conservative static duration budget counts all branches.
+- Canonical acceptance: PENDING.
+
+## Phases 11–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.

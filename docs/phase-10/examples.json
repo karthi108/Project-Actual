@@ -1,0 +1,352 @@
+[
+  {
+    "schema_version": "actual-core-v1",
+    "ir_version": "actual-workflow-v1",
+    "id": "synthetic_text",
+    "version": 1,
+    "classification": "synthetic",
+    "trigger_schema": [
+      {
+        "schema_version": "actual-core-v1",
+        "name": "text",
+        "type": "text"
+      }
+    ],
+    "steps": [
+      {
+        "schema_version": "actual-core-v1",
+        "id": "start",
+        "kind": "trigger",
+        "capability": null,
+        "inputs": [],
+        "effect": "READ_ONLY",
+        "permissions": [],
+        "human_review": false,
+        "idempotency": "pure",
+        "timeout_seconds": 30,
+        "retry": {
+          "schema_version": "actual-core-v1",
+          "attempts": 1,
+          "backoff_seconds": 1
+        },
+        "failure": "route_error",
+        "classification": "synthetic",
+        "protects": null,
+        "wait_seconds": 1,
+        "terminal": "succeeded"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "id": "copy",
+        "kind": "deterministic",
+        "capability": "copy_text",
+        "inputs": [
+          {
+            "schema_version": "actual-core-v1",
+            "name": "text",
+            "source": "trigger",
+            "value": null,
+            "step": null,
+            "field": "text"
+          }
+        ],
+        "effect": "READ_ONLY",
+        "permissions": [],
+        "human_review": false,
+        "idempotency": "pure",
+        "timeout_seconds": 30,
+        "retry": {
+          "schema_version": "actual-core-v1",
+          "attempts": 1,
+          "backoff_seconds": 1
+        },
+        "failure": "route_error",
+        "classification": "synthetic",
+        "protects": null,
+        "wait_seconds": 1,
+        "terminal": "succeeded"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "id": "done",
+        "kind": "terminate",
+        "capability": null,
+        "inputs": [],
+        "effect": "READ_ONLY",
+        "permissions": [],
+        "human_review": false,
+        "idempotency": "pure",
+        "timeout_seconds": 30,
+        "retry": {
+          "schema_version": "actual-core-v1",
+          "attempts": 1,
+          "backoff_seconds": 1
+        },
+        "failure": "route_error",
+        "classification": "synthetic",
+        "protects": null,
+        "wait_seconds": 1,
+        "terminal": "succeeded"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "id": "failed",
+        "kind": "terminate",
+        "capability": null,
+        "inputs": [],
+        "effect": "READ_ONLY",
+        "permissions": [],
+        "human_review": false,
+        "idempotency": "pure",
+        "timeout_seconds": 30,
+        "retry": {
+          "schema_version": "actual-core-v1",
+          "attempts": 1,
+          "backoff_seconds": 1
+        },
+        "failure": "route_error",
+        "classification": "synthetic",
+        "protects": null,
+        "wait_seconds": 1,
+        "terminal": "failed"
+      }
+    ],
+    "edges": [
+      {
+        "schema_version": "actual-core-v1",
+        "source": "start",
+        "outcome": "success",
+        "target": "copy"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "source": "copy",
+        "outcome": "success",
+        "target": "done"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "source": "copy",
+        "outcome": "error",
+        "target": "failed"
+      }
+    ],
+    "max_steps": 64,
+    "max_model_calls": 0,
+    "max_duration_seconds": 900
+  },
+  {
+    "schema_version": "actual-core-v1",
+    "ir_version": "actual-workflow-v1",
+    "id": "synthetic_effect",
+    "version": 1,
+    "classification": "synthetic",
+    "trigger_schema": [],
+    "steps": [
+      {
+        "schema_version": "actual-core-v1",
+        "id": "start",
+        "kind": "trigger",
+        "capability": null,
+        "inputs": [],
+        "effect": "READ_ONLY",
+        "permissions": [],
+        "human_review": false,
+        "idempotency": "pure",
+        "timeout_seconds": 30,
+        "retry": {
+          "schema_version": "actual-core-v1",
+          "attempts": 1,
+          "backoff_seconds": 1
+        },
+        "failure": "route_error",
+        "classification": "synthetic",
+        "protects": null,
+        "wait_seconds": 1,
+        "terminal": "succeeded"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "id": "policy",
+        "kind": "policy",
+        "capability": null,
+        "inputs": [],
+        "effect": "READ_ONLY",
+        "permissions": [],
+        "human_review": false,
+        "idempotency": "pure",
+        "timeout_seconds": 30,
+        "retry": {
+          "schema_version": "actual-core-v1",
+          "attempts": 1,
+          "backoff_seconds": 1
+        },
+        "failure": "route_error",
+        "classification": "synthetic",
+        "protects": "send",
+        "wait_seconds": 1,
+        "terminal": "succeeded"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "id": "review",
+        "kind": "human_approval",
+        "capability": null,
+        "inputs": [],
+        "effect": "READ_ONLY",
+        "permissions": [],
+        "human_review": false,
+        "idempotency": "pure",
+        "timeout_seconds": 30,
+        "retry": {
+          "schema_version": "actual-core-v1",
+          "attempts": 1,
+          "backoff_seconds": 1
+        },
+        "failure": "route_error",
+        "classification": "synthetic",
+        "protects": "send",
+        "wait_seconds": 1,
+        "terminal": "succeeded"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "id": "send",
+        "kind": "tool",
+        "capability": "fake_write",
+        "inputs": [
+          {
+            "schema_version": "actual-core-v1",
+            "name": "destination",
+            "source": "literal",
+            "value": "synthetic_inbox",
+            "step": null,
+            "field": null
+          },
+          {
+            "schema_version": "actual-core-v1",
+            "name": "text",
+            "source": "literal",
+            "value": "Fabricated message",
+            "step": null,
+            "field": null
+          }
+        ],
+        "effect": "EXTERNAL_WRITE",
+        "permissions": [
+          "fake_write"
+        ],
+        "human_review": true,
+        "idempotency": "provider_key",
+        "timeout_seconds": 30,
+        "retry": {
+          "schema_version": "actual-core-v1",
+          "attempts": 1,
+          "backoff_seconds": 1
+        },
+        "failure": "route_error",
+        "classification": "synthetic",
+        "protects": null,
+        "wait_seconds": 1,
+        "terminal": "succeeded"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "id": "done",
+        "kind": "terminate",
+        "capability": null,
+        "inputs": [],
+        "effect": "READ_ONLY",
+        "permissions": [],
+        "human_review": false,
+        "idempotency": "pure",
+        "timeout_seconds": 30,
+        "retry": {
+          "schema_version": "actual-core-v1",
+          "attempts": 1,
+          "backoff_seconds": 1
+        },
+        "failure": "route_error",
+        "classification": "synthetic",
+        "protects": null,
+        "wait_seconds": 1,
+        "terminal": "succeeded"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "id": "failed",
+        "kind": "terminate",
+        "capability": null,
+        "inputs": [],
+        "effect": "READ_ONLY",
+        "permissions": [],
+        "human_review": false,
+        "idempotency": "pure",
+        "timeout_seconds": 30,
+        "retry": {
+          "schema_version": "actual-core-v1",
+          "attempts": 1,
+          "backoff_seconds": 1
+        },
+        "failure": "route_error",
+        "classification": "synthetic",
+        "protects": null,
+        "wait_seconds": 1,
+        "terminal": "failed"
+      }
+    ],
+    "edges": [
+      {
+        "schema_version": "actual-core-v1",
+        "source": "start",
+        "outcome": "success",
+        "target": "policy"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "source": "policy",
+        "outcome": "allow",
+        "target": "review"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "source": "policy",
+        "outcome": "deny",
+        "target": "failed"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "source": "review",
+        "outcome": "approved",
+        "target": "send"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "source": "review",
+        "outcome": "denied",
+        "target": "failed"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "source": "review",
+        "outcome": "timeout",
+        "target": "failed"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "source": "send",
+        "outcome": "success",
+        "target": "done"
+      },
+      {
+        "schema_version": "actual-core-v1",
+        "source": "send",
+        "outcome": "error",
+        "target": "failed"
+      }
+    ],
+    "max_steps": 64,
+    "max_model_calls": 0,
+    "max_duration_seconds": 900
+  }
+]
