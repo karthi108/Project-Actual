@@ -28,8 +28,9 @@ from actual.core.primitives import ActorId, Contract, Digest, Instant, Workspace
 from .connectors import Access, Authorizer, ToolError, WriteInput, WriteOutput, WritePort
 from .ir import Name, Step, Workflow
 from .runtime import inputs, route
+from .schema_guard import verify
 from .state import Run, Value
-from .storage import Conflict, Store, decode, runs
+from .storage import Conflict, Store, runs
 from .storage import audit as run_audit
 
 metadata = MetaData()
@@ -85,6 +86,7 @@ def migrate(engine: Engine) -> None:
     with engine.begin() as connection:
         connection.execute(text("SELECT pg_advisory_xact_lock(734013001)"))
         metadata.create_all(connection)
+        verify(connection, metadata)
         found = connection.execute(select(schema.c.version)).scalars().all()
         if found and found != [1]:
             raise Conflict("Unsupported approval migration version")
@@ -162,6 +164,15 @@ class Approval(Contract):
     reviewed_digest: Digest
 
 
+def approval_seal(approval: Approval) -> str:
+    return content_digest(
+        {
+            "access": approval.binding.access().model_dump(mode="json"),
+            "approval": approval.model_dump(mode="json"),
+        }
+    )
+
+
 def request(values: tuple[Value, ...]) -> WriteInput:
     if len(values) != 2 or len({value.name for value in values}) != 2:
         raise ToolError("denied")
@@ -213,7 +224,7 @@ class ApprovalService:
             .mappings()
             .one()
         )
-        run = decode(row["payload"])
+        run = self.store._run(row)
         if (
             run.workspace_id.root != self.store.owner
             or run.id != identifier
@@ -289,7 +300,11 @@ class ApprovalService:
                 intent=b.intent_digest,
                 approval=approval.id,
                 binding=b.digest,
-                authority=content_digest(b.access().model_dump(mode="json")),
+                authority=(
+                    approval_seal(approval)
+                    if state == "approved"
+                    else content_digest(b.access().model_dump(mode="json"))
+                ),
                 state=state,
             )
         )
@@ -468,11 +483,21 @@ class Dispatcher:
             self.service.policy_version,
         )
         if (
-            not record["active"]
+            record["active"] != 1
+            or approval.id != record["id"]
             or approval.expires_at <= now
             or approval.binding != binding
             or not self.service.authorizer.allows(binding.access())
         ):
+            raise ToolError("denied")
+        seal = connection.execute(
+            select(audit.c.authority).where(
+                audit.c.owner == self.service.store.owner,
+                audit.c.approval == approval.id,
+                audit.c.state == "approved",
+            )
+        ).scalar_one_or_none()
+        if seal != approval_seal(approval):
             raise ToolError("denied")
         if record["intent"] is not None and record["intent"] != binding.intent_digest:
             raise ToolError("denied")

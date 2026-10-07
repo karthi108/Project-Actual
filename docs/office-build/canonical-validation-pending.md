@@ -206,6 +206,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: uncertain dispatch reconciles without resend; no automatic unsend/compensation. A compensating action requires its own reviewed intent. Dead letters preserve failure metadata and do not automatically reactivate a run.
 - Canonical acceptance: PENDING.
 
-## Phases 24–27
+## Phase 24 — Security hardening
+
+- Implementation commit: unique `wip(phase-24):` checkpoint; preceding Phase 23 `e8a77f7`.
+- Implementation: IMPLEMENTED. Relational/payload identity checks, full approval audit seal, exact connector arguments and provisional migration shape validation; threat-to-test matrix in Phase 24.
+- Checks run here: 236 workflow/model tests and 43 scoped real-PostgreSQL workflow/security tests on each supported Python version; Ruff, strict typing both targets, current CareerLab manifest and frozen artifact audit. Initial lint/RowMapping findings and a test fixture's `bool`/`boolean` type typo (42 passed, 1 failed on the initial database run) were corrected before the clean dual-Python run. Tests were not weakened.
+- Checks not run: external penetration testing, actual OAuth/DNS/provider attacks, real-data security or canonical security certification.
+- Environment dependency: existing PostgreSQL/Python only; no new library, account or secret.
+- Security validation pending: canonical threat review and adversarial suite, database/runtime-role enforcement for new tables, real identity and real provider boundary validation.
+- Live integration pending: all real connectors and authentication infrastructure.
+- Known limitations: seals detect inconsistent records, not administrator compromise. Earlier provisional effect approvals lack the full seal and require a fresh review/run. Synthetic classification and loopback do not authenticate/detect real data. Accepted artifacts and Career migrations remain unchanged.
+- Canonical acceptance: PENDING.
+
+## Phases 25–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.

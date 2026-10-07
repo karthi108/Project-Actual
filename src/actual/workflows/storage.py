@@ -18,11 +18,13 @@ from sqlalchemy import (
     update,
 )
 from sqlalchemy.dialects.postgresql import JSONB, insert
+from sqlalchemy.engine import RowMapping
 from sqlalchemy.sql.elements import ColumnElement
 
 from actual.core.primitives import WorkspaceId, content_digest
 
 from .ir import Workflow, value_type
+from .schema_guard import verify
 from .state import Run, Value
 
 metadata = MetaData()
@@ -86,6 +88,7 @@ def migrate(engine: Engine) -> None:
     with engine.begin() as connection:
         connection.execute(text("SELECT pg_advisory_xact_lock(734011001)"))
         metadata.create_all(connection)
+        verify(connection, metadata)
         found = connection.execute(select(version.c.version)).scalars().all()
         if found and found not in ([1], [2]):
             raise Conflict("Unsupported workflow migration version")
@@ -107,17 +110,43 @@ class Store:
     def _scope(self, identifier: str) -> ColumnElement[bool]:
         return (runs.c.owner == self.owner) & (runs.c.id == identifier)
 
+    def _run(self, row: RowMapping) -> Run:
+        run = decode(row["payload"])
+        if (
+            run.workspace_id.root != self.owner
+            or run.workspace_id.root != row["owner"]
+            or run.id != row["id"]
+            or run.revision != row["revision"]
+            or run.trigger_id != row["trigger_id"]
+            or content_digest(tuple(v.model_dump(mode="json") for v in run.trigger))
+            != row["trigger_digest"]
+        ):
+            raise Conflict("Stored run identity conflict")
+        return run
+
+    def _definition(self, row: RowMapping, digest: str) -> Workflow:
+        workflow = Workflow.model_validate_json(json.dumps(row["payload"]))
+        if (
+            workflow.digest != digest
+            or row["owner"] != self.owner
+            or workflow.id != row["name"]
+            or workflow.version != row["version"]
+        ):
+            raise Conflict("Definition identity mismatch")
+        return workflow
+
     def definition(self, digest: str) -> Workflow:
         with self.engine.connect() as connection:
-            payload = connection.execute(
-                select(definitions.c.payload).where(
-                    definitions.c.owner == self.owner, definitions.c.digest == digest
+            row = (
+                connection.execute(
+                    select(definitions).where(
+                        definitions.c.owner == self.owner, definitions.c.digest == digest
+                    )
                 )
-            ).scalar_one()
-        workflow = Workflow.model_validate_json(json.dumps(payload))
-        if workflow.digest != digest:
-            raise Conflict("Definition digest mismatch")
-        return workflow
+                .mappings()
+                .one()
+            )
+        return self._definition(row, digest)
 
     def start(
         self, workflow: Workflow, trigger_id: str, values: tuple[Value, ...], now: datetime
@@ -129,6 +158,7 @@ class Store:
             or {v.name: value_type(v.value) for v in values} != expected
         ):
             raise ValueError("Trigger schema mismatch")
+        values = tuple(sorted(values, key=lambda value: value.name))
         run = Run(
             id="run_" + uuid4().hex,
             workspace_id=WorkspaceId(self.owner),
@@ -189,17 +219,12 @@ class Store:
             )
             if row["trigger_digest"] != digest:
                 raise Conflict("Trigger identity reused with different input")
-            return decode(row["payload"])
+            return self._run(row)
 
     def load(self, identifier: str) -> Run:
         with self.engine.connect() as connection:
-            payload = connection.execute(
-                select(runs.c.payload).where(self._scope(identifier))
-            ).scalar_one()
-        result = decode(payload)
-        if result.workspace_id.root != self.owner:
-            raise Conflict("Stored owner mismatch")
-        return result
+            row = connection.execute(select(runs).where(self._scope(identifier))).mappings().one()
+        return self._run(row)
 
     def claim(self, identifier: str, now: datetime) -> tuple[Run, int] | None:
         with self.engine.begin() as connection:
@@ -208,23 +233,24 @@ class Store:
                 .mappings()
                 .one()
             )
-            run = decode(row["payload"])
+            run = self._run(row)
             if run.status in ("succeeded", "failed", "cancelled"):
                 return None
             if row["lease_until"] is not None and row["lease_until"] > now:
                 return None
-            workflow = Workflow.model_validate_json(
-                json.dumps(
-                    connection.execute(
-                        select(definitions.c.payload).where(
-                            definitions.c.owner == self.owner,
-                            definitions.c.digest == run.definition_digest,
-                        )
-                    ).scalar_one()
+            workflow = self._definition(
+                connection.execute(
+                    select(definitions).where(
+                        definitions.c.owner == self.owner,
+                        definitions.c.digest == run.definition_digest,
+                    )
                 )
+                .mappings()
+                .one(),
+                run.definition_digest,
             )
-            if workflow.digest != run.definition_digest:
-                raise Conflict("Definition digest mismatch")
+            if workflow.id != row["workflow"]:
+                raise Conflict("Stored workflow identity conflict")
             if (
                 run.due_at is not None
                 and run.due_at > now
@@ -316,7 +342,7 @@ class Store:
                 .mappings()
                 .one()
             )
-            old = decode(row["payload"])
+            old = self._run(row)
             if old.revision != revision or old.status in ("succeeded", "failed", "cancelled"):
                 raise Conflict("Stale or terminal run")
             changed = old.model_copy(update={"status": "cancelled", "revision": revision + 1})

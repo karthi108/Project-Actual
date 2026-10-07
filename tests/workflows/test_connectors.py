@@ -83,6 +83,10 @@ def test_write_denied_and_untrusted_content_remains_data():
     send = next(s for s in effect_workflow().steps if s.id == "send")
     with pytest.raises(ToolError, match="denied"):
         connector.execute(run(), send, ())
+    with pytest.raises(ToolError, match="denied"):
+        connector.execute(
+            run(), read_step(), (Value(name="resource", value="synthetic_record"),) * 2
+        )
     assert (
         "Ignore policy"
         in connector.execute(

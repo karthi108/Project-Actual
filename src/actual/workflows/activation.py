@@ -28,6 +28,7 @@ from .approval import ApprovalService, Dispatcher, FakeWriter
 from .connectors import Access, Authorizer, FakeReader, LocalPolicy, ReadConnector, ToolError
 from .ir import Name, Workflow
 from .runtime import Runtime
+from .schema_guard import verify
 from .storage import Conflict, Store
 
 
@@ -72,6 +73,7 @@ def migrate(engine: Engine) -> None:
     with engine.begin() as connection:
         connection.execute(text("SELECT pg_advisory_xact_lock(734016001)"))
         metadata.create_all(connection)
+        verify(connection, metadata)
         found = connection.execute(select(schema.c.version)).scalars().all()
         if found and found != [1]:
             raise Conflict("Unsupported activation migration version")

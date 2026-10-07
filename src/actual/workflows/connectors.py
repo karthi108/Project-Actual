@@ -123,6 +123,8 @@ class ReadConnector:
     def execute(self, run: Run, step: Step, values: tuple[Value, ...]) -> tuple[Value, ...]:
         if step.capability != "fake_read" or step.effect != "READ_ONLY":
             raise ToolError("denied")
+        if len(values) != 1 or values[0].name != "resource":
+            raise ToolError("denied")
         try:
             request = ReadInput.model_validate({v.name: v.value for v in values})
         except ValidationError:

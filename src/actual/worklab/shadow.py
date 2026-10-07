@@ -9,6 +9,7 @@ from sqlalchemy.dialects.postgresql import JSONB, insert
 
 from actual.core.primitives import Contract, Digest, WorkspaceId, content_digest
 from actual.workflows.ir import Name, Workflow, outcomes
+from actual.workflows.schema_guard import verify
 from actual.workflows.storage import Conflict
 
 from .replay import Case, Result, replay
@@ -105,6 +106,7 @@ def migrate(engine: Engine) -> None:
     with engine.begin() as connection:
         connection.execute(text("SELECT pg_advisory_xact_lock(734015001)"))
         metadata.create_all(connection)
+        verify(connection, metadata)
         found = connection.execute(select(schema.c.version)).scalars().all()
         if found and found != [1]:
             raise Conflict("Unsupported shadow migration version")
