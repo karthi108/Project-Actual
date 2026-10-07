@@ -134,6 +134,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known limitations: transient event tuple, one observed example per session, no automatic archive or process completeness claim; labels cannot detect deliberately mislabeled private input. No secure erasure guarantee.
 - Canonical acceptance: PENDING.
 
-## Phases 18–27
+## Phase 18 — Process discovery
+
+- Implementation commit: unique `wip(phase-18):` checkpoint; preceding Phase 17 `7c80ba5`.
+- Implementation: IMPLEMENTED bounded deterministic discovery: grouping, variants/repeated sequences, transitions/branches, returns/rework, elapsed durations/gaps.
+- Checks run here: 41 pure checks on both supported Python versions, Ruff and strict typing both targets. Three synthetic development traces match separate test assertions; shuffled arrival, duplicate/conflicting identity, ambiguous time and owner scope checked.
+- Checks not run: complete real processes, performance benchmark, causal/active-time validation or held-out accuracy.
+- Environment dependency: Python only; no process-mining dependency introduced.
+- Security validation pending: canonical event integrity, scope, size and clock-boundary review.
+- Live integration pending: real capture/event feeds; none enabled here.
+- Known limitations: repeated observed activities are returns/rework, not executable loops; elapsed gaps are not active work, causal delay or ROI. Missing events and branches cannot be inferred into completeness.
+- Canonical acceptance: PENDING.
+
+## Phases 19–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.

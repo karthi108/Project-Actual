@@ -17,7 +17,8 @@ Each phase has a separate WIP checkpoint. The implementation commit is located b
 | 15 | Implemented; persisted synthetic shadow comparisons | 30 pure checks and shadow database checks on both Python versions, typing and Ruff | PENDING |
 | 16 | Implemented; reviewed synthetic step activation | 30 pure checks and 2 activation/database checks on both Python versions, typing and Ruff | PENDING |
 | 17 | Implemented synthetic semantic/display harness; native capture pending | 37 pure tests on both Python versions, visible console demo, typing and Ruff | PENDING |
-| 18–27 | Development continues in roadmap order | Recorded at each checkpoint | PENDING |
+| 18 | Implemented; deterministic synthetic process discovery | 41 pure checks on both Python versions, synthetic process truth, typing and Ruff | PENDING |
+| 19–27 | Development continues in roadmap order | Recorded at each checkpoint | PENDING |
 
 [Validation debt](canonical-validation-pending.md) records actual checks and outstanding personal-environment validation. [Phase-7 verification](../phase-7/migration-verification.md) contains reproduced office results. Frozen evaluation records remain historical; deterministic replay is not fresh inference or independent held-out evidence.
 
