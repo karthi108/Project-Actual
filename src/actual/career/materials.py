@@ -21,6 +21,8 @@ from actual.core.references import ClaimRef
 from actual.core.workflow import ContentReview
 from actual.profile.contracts import Assertion
 
+from .preparation_context import PreparationContext
+
 
 class CVVariant(Contract):
     id: CVId
@@ -77,6 +79,9 @@ class Draft(Contract):
     summary: Text
     assertions: Annotated[tuple[DraftAssertion, ...], Field(max_length=200)]
     review: ContentReview | None = None
+    preparation: PreparationContext | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
     @property
     def content_digest(self) -> str:
@@ -84,6 +89,16 @@ class Draft(Contract):
 
     @model_validator(mode="after")
     def valid_owners_and_review(self) -> Self:
+        if self.preparation is not None and any(
+            ref.workspace_id != self.workspace_id or ref.classification != self.classification
+            for ref in (self.preparation.job, self.preparation.cv)
+        ):
+            raise ValueError("Preparation sources must share draft ownership/classification")
+        if self.preparation is not None and (
+            self.preparation.job.workspace_id != self.workspace_id
+            or self.classification != "synthetic"
+        ):
+            raise ValueError("Preparation belongs to another workspace or classification")
         if any(
             ref.workspace_id != self.workspace_id or ref.profile_id != self.profile_id
             for assertion in self.assertions

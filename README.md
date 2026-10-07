@@ -10,6 +10,8 @@ ACTUAL chooses ordinary software before AI, treats model output as an untrusted 
 
 Start with [the engineering contract](docs/phase-0/engineering-contract.md), [profile usage and file map](docs/phase-7/README.md), [Phase-7 design/gates](docs/phase-7/design.md), [ADR 0009](docs/adr/0009-evidence-backed-profile-boundary.md) and [Phase-7 evidence](docs/phase-7/acceptance-review.md). [Accepted Job Intelligence](docs/phase-6a/README.md), [Phase-6A evidence](docs/phase-6a/acceptance-review.md), the [original Phase-6 NO-GO](docs/phase-6/acceptance-review.md) and its source snapshot remain unchanged. Accepted [Model Gateway](docs/phase-5/README.md), [API](docs/phase-4/README.md), [Persistence](docs/phase-3/README.md), [Core](docs/phase-2/README.md) and [CareerLab](docs/phase-1/README.md) remain historical baselines. Validation and locked-test datasets remain unmaterialized. The [continuous-build authorization](docs/adr/0010-continuous-office-build.md) supersedes the earlier Phase-7 stopping rule. Continue in phase order without per-phase approval; canonical validation occurs later on the personal laptop.
 
+The [Phase-9 preparation boundary](docs/phase-9/README.md) adds controlled source-linked materials and exact content review. Its office checks passed; canonical acceptance remains pending.
+
 ## Contract map
 
 The [Phase-8 career interface](docs/phase-8/README.md) is implemented and office verified, with canonical acceptance pending. It uses the existing synthetic API for jobs, evidence review/withdrawal and application tracking. Start its loopback frontend from `apps/web` after configuring an isolated synthetic API/database; no real-data access or external submission is enabled.

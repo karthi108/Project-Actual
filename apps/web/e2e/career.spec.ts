@@ -49,14 +49,14 @@ test("fabricated career journey preserves review distinctions and recorded track
   await page.getByRole("button", { name: "Start preparing" }).click();
   await page.getByRole("button", { name: "Applications", exact: true }).click();
   await expect(
-    page.getByText("preparing", { exact: true }).first(),
+    page.getByRole("cell", { name: "preparing", exact: true }),
   ).toBeVisible();
   await page
     .getByLabel("Next reported status")
     .selectOption("ready_for_review");
   await page.getByRole("button", { name: "Record status" }).click();
   await expect(
-    page.getByText("ready for review", { exact: true }).first(),
+    page.getByRole("cell", { name: "ready for review", exact: true }),
   ).toBeVisible();
   await page.getByLabel("Next reported status").selectOption("offer");
   await page.getByRole("button", { name: "Record status" }).click();
@@ -71,7 +71,7 @@ test("fabricated career journey preserves review distinctions and recorded track
     page.getByRole("button", { name: "Record status" }),
   ).toBeEnabled();
   await expect(
-    page.getByText("ready for review", { exact: true }).first(),
+    page.getByRole("cell", { name: "ready for review", exact: true }),
   ).toBeVisible();
   await page.screenshot({
     path: "test-results/career-workspace.png",

@@ -8,7 +8,8 @@ Each phase has a separate WIP checkpoint. The implementation commit is located b
 | --- | --- | --- | --- |
 | 7 | Implemented; checkpoint `wip(phase-7): implement verified career profile` | Full dual-Python/real-PostgreSQL, typing/lint, integrity/replay and Qwen smoke passed | PENDING |
 | 8 | Implemented; checkpoint `wip(phase-8): add career workflow interface` | Strict TypeScript, 22 unit tests, formatting, production build and 2 real Edge/API/PostgreSQL tests passed | PENDING |
-| 9–27 | Development continues in roadmap order | Recorded at each checkpoint | PENDING |
+| 9 | Implemented; checkpoint `wip(phase-9): add evidence-backed application preparation` | 1,467 tests on each Python version with real PostgreSQL; strict typing, frozen audit, web build and 3 browser journeys passed | PENDING |
+| 10–27 | Development continues in roadmap order | Recorded at each checkpoint | PENDING |
 
 [Validation debt](canonical-validation-pending.md) records actual checks and outstanding personal-environment validation. [Phase-7 verification](../phase-7/migration-verification.md) contains reproduced office results. Frozen evaluation records remain historical; deterministic replay is not fresh inference or independent held-out evidence.
 

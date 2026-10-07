@@ -11,7 +11,7 @@
     "dev": "next dev --hostname 127.0.0.1 --port 3000",
     "build": "next build",
     "start": "next start --hostname 127.0.0.1 --port 3000",
-    "types:generate": "openapi-typescript ../../docs/phase-7/openapi-v1.json -o src/lib/api.generated.ts",
+    "types:generate": "openapi-typescript ../../docs/phase-9/openapi-v1.json -o src/lib/api.generated.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "e2e": "playwright test",

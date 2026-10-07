@@ -25,6 +25,18 @@ All office checkpoints remain CANONICAL ACCEPTANCE PENDING. Passing office check
 - Known office findings: exact comparison to Next's normalized internal URL rejected legitimate browser reads; admitted local URL aliases with exact browser Host/Origin binding fixed it. Evidence detail expansion closed during a generation refresh; explicit UI expansion state fixed it. Source content/provenance is visible before review. Failed attempts remain recorded as findings; the final real journey passed.
 - Canonical acceptance: PENDING.
 
-## Phases 9–27
+## Phase 9 — Application Preparation
+
+- Implementation commit: unique `wip(phase-9): add evidence-backed application preparation` checkpoint.
+- Implementation: IMPLEMENTED. Controlled source-linked CV adaptation, messages and letters; transient CV comparison; exact content review and revision invalidation.
+- Checks run here: Python 3.13.13 and 3.14.4, 1,467 tests passed each against a fresh native PostgreSQL 18.6 database; strict mypy; Ruff; 22 frontend unit tests, TypeScript, formatting and production build; 3 real Edge/bridge/API/PostgreSQL journeys; 46 accepted and 2 frozen Phase-7 artifacts preserved.
+- Failed attempts preserved: JSON arrays initially rejected by strict command tuples; review initially violated the accepted record revision rule; timestamp-tied event ordering made an assertion nondeterministic; tracking form selection raced an aggregate refresh. Fixed at the respective boundary, without weakening the contract. Final full dual-Python and browser reruns passed. Sandboxed initdb could not create a restricted token; existing permitted native harness ran outside the sandbox and removed its own disposable cluster.
+- Checks not run / environment dependency: Docker, canonical personal environment, additional browsers and accessibility review.
+- Security validation pending: canonical authority, stale-content, origin and adversarial review. No real-data intake, external submission or effect approval introduced.
+- Live integration pending: canonical browser/API/PostgreSQL validation. Templates are sparse and deterministic; no new Qwen inference or accuracy claim.
+- Known limitations: UI comparison accepts one quote, API up to eight; dependency-changing edits require explicit reconciliation and are rejected while prepared references depend on them. Content review is not external-action approval.
+- Canonical acceptance: PENDING.
+
+## Phases 10–27
 
 Implementation and check records are added as each phase is developed. No unavailable integration is represented as working. No final green command accepts the entire roadmap.

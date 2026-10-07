@@ -3,9 +3,9 @@ const BACKEND = "http://127.0.0.1:8765";
 const UI_HOSTS = new Set(["127.0.0.1:3000", "localhost:3000"]);
 const LIMIT = 262144;
 const reads =
-  /^(career|jobs(?:\/job_[0-9a-f]{32})?|profile(?:\/evidence)?|applications(?:\/application_[0-9a-f]{32})?|events)$/;
+  /^(career|jobs(?:\/job_[0-9a-f]{32})?|profile(?:\/evidence)?|applications(?:\/application_[0-9a-f]{32})?|events|drafts\/draft_[0-9a-f]{32})$/;
 const writes =
-  /^(career|jobs|profile\/(?:claims|evidence)|profile\/evidence\/evidence_[0-9a-f]{32}\/(?:synthetic-review|withdraw)|profile\/claims\/claim_[0-9a-f]{32}\/synthetic-review|applications(?:\/application_[0-9a-f]{32}\/status)?)$/;
+  /^(career|jobs|profile\/(?:claims|evidence)|profile\/evidence\/evidence_[0-9a-f]{32}\/(?:synthetic-review|withdraw)|profile\/claims\/claim_[0-9a-f]{32}\/synthetic-review|applications(?:\/application_[0-9a-f]{32}\/status)?|cvs(?:\/compare)?|drafts(?:\/draft_[0-9a-f]{32}\/(?:revise|review))?)$/;
 
 function failure(status: number, code: string) {
   return Response.json(

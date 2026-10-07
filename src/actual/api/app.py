@@ -21,6 +21,14 @@ from actual.application.commands import (
 )
 from actual.application.errors import UseCaseCode, UseCaseError
 from actual.application.ports import CareerState
+from actual.application.preparation_commands import (
+    CompareCVs,
+    CreateCV,
+    PrepareDraft,
+    ReviewDraft,
+    ReviseDraft,
+)
+from actual.application.preparation_service import PreparationService
 from actual.application.profile_commands import (
     ReviewSyntheticClaim,
     ReviewSyntheticEvidence,
@@ -30,7 +38,7 @@ from actual.application.service import CareerService
 from actual.career.applications import Application
 from actual.career.events import WorkEvent
 from actual.career.jobs import Job
-from actual.core.primitives import ApplicationId, ClaimId, EvidenceId, JobId
+from actual.core.primitives import ApplicationId, ClaimId, DraftId, EvidenceId, JobId
 from actual.persistence.database import create_database_engine, verify_schema
 from actual.persistence.errors import (
     ConflictError,
@@ -41,11 +49,13 @@ from actual.persistence.errors import (
     SchemaMismatchError,
 )
 from actual.persistence.repository import CareerStore
+from actual.preparation.comparison import CVComparison
 
 from .config import ApiSettings
 from .contracts import (
     ApplicationView,
     CareerView,
+    DraftView,
     ErrorResponse,
     EvidenceProfileResponse,
     Health,
@@ -55,15 +65,23 @@ from .contracts import (
     StatePage,
 )
 from .transport import LocalBoundary, error_response
-from .wiring import ApiRuntime, career_service, runtime
+from .wiring import ApiRuntime, career_service, preparation_service, runtime
 
 type Service = Annotated[CareerService, Depends(career_service)]
+type Preparation = Annotated[PreparationService, Depends(preparation_service)]
 type Offset = Annotated[int, Query(ge=0, le=1_000_000)]
 type Limit = Annotated[int, Query(ge=1, le=100)]
 type JobPath = Annotated[str, Path(pattern=r"^job_[0-9a-f]{32}$")]
 type ApplicationPath = Annotated[str, Path(pattern=r"^application_[0-9a-f]{32}$")]
 type EvidencePath = Annotated[str, Path(pattern=r"^evidence_[0-9a-f]{32}$")]
 type ClaimPath = Annotated[str, Path(pattern=r"^claim_[0-9a-f]{32}$")]
+type DraftPath = Annotated[str, Path(pattern=r"^draft_[0-9a-f]{32}$")]
+
+
+def _draft_view(state: CareerState, identifier: DraftId) -> DraftView:
+    draft = next(item for item in state.snapshot.drafts if item.id == identifier)
+    return DraftView(generation=state.generation, draft=draft, content_digest=draft.content_digest)
+
 
 _ERRORS: dict[UseCaseCode, tuple[int, str]] = {
     UseCaseCode.RESOURCE_NOT_FOUND: (404, "The requested resource is absent."),
@@ -360,6 +378,37 @@ def create_app(
         return Page[WorkEvent](
             items=items, offset=offset, limit=limit, total=len(records), next_offset=following
         )
+
+    @router.post("/cvs", response_model=CareerView, status_code=201, tags=["preparation"])
+    def create_cv(command: CreateCV, service: Preparation) -> CareerView:
+        state = service.create_cv(command)
+        return CareerView(generation=state.generation, snapshot=state.snapshot)
+
+    @router.post("/cvs/compare", response_model=CVComparison, tags=["preparation"])
+    def compare_cvs(command: CompareCVs, service: Preparation) -> CVComparison:
+        return service.compare_cvs(command)
+
+    @router.post("/drafts", response_model=DraftView, status_code=201, tags=["preparation"])
+    def prepare(command: PrepareDraft, service: Preparation) -> DraftView:
+        return _draft_view(service.prepare(command), command.id)
+
+    @router.post("/drafts/{draft_id}/revise", response_model=DraftView, tags=["preparation"])
+    def revise(draft_id: DraftPath, command: ReviseDraft, service: Preparation) -> DraftView:
+        identifier = DraftId(draft_id)
+        return _draft_view(service.revise(identifier, command), identifier)
+
+    @router.post("/drafts/{draft_id}/review", response_model=DraftView, tags=["preparation"])
+    def review(draft_id: DraftPath, command: ReviewDraft, service: Preparation) -> DraftView:
+        identifier = DraftId(draft_id)
+        return _draft_view(service.review(identifier, command), identifier)
+
+    @router.get("/drafts/{draft_id}", response_model=DraftView, tags=["preparation"])
+    def draft(draft_id: DraftPath, service: Preparation) -> DraftView:
+        identifier = DraftId(draft_id)
+        state = service.get_state()
+        if not any(item.id == identifier for item in state.snapshot.drafts):
+            raise UseCaseError(UseCaseCode.RESOURCE_NOT_FOUND)
+        return _draft_view(state, identifier)
 
     app.include_router(router)
     return app

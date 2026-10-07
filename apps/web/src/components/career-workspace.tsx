@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { PreparationPanel } from "./preparation-panel";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   flexRender,
@@ -35,13 +36,20 @@ import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 
 type Screen =
-  "Overview" | "Jobs" | "Profile" | "Skills" | "Applications" | "Settings";
+  | "Overview"
+  | "Jobs"
+  | "Profile"
+  | "Skills"
+  | "Applications"
+  | "Preparation"
+  | "Settings";
 const navigation = [
   ["Overview", LayoutDashboard],
   ["Jobs", BriefcaseBusiness],
   ["Profile", UserRound],
   ["Skills", Layers3],
   ["Applications", FileText],
+  ["Preparation", FileText],
   ["Settings", Settings2],
 ] as const;
 function Badge({ children }: { children: React.ReactNode }) {
@@ -708,6 +716,9 @@ export function CareerWorkspace() {
             <Table items={snapshot.applications} columns={appColumns} />
           </Card>
         )}
+        {state && screen === "Preparation" && (
+          <PreparationPanel career={state} />
+        )}
         {screen === "Settings" && (
           <Card>
             <h2 className="text-xl font-semibold mb-5">
@@ -993,7 +1004,7 @@ function StatusForm({
   }
   return (
     <form onSubmit={save} className="min-w-48">
-      <select name="state" aria-label="Next reported status">
+      <select name="state" aria-label="Next reported status" disabled={busy}>
         {[
           "preparing",
           "ready_for_review",
@@ -1009,7 +1020,12 @@ function StatusForm({
         ))}
       </select>
       <label className="text-xs flex gap-2 items-center">
-        <input name="manual" type="checkbox" className="w-auto" />
+        <input
+          name="manual"
+          type="checkbox"
+          className="w-auto"
+          disabled={busy}
+        />
         Manually applied outside ACTUAL
       </label>
       <Button size="sm" variant="outline" disabled={busy}>

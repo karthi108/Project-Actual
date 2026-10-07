@@ -6,6 +6,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from actual.career.applications import Application
 from actual.career.jobs import Job
+from actual.career.materials import Draft
 from actual.career.snapshot import CareerSnapshot
 from actual.profile.contracts import Profile
 from actual.profile.projection import EvidenceBackedProfileView
@@ -21,6 +22,12 @@ class ApiModel(BaseModel):
 class CareerView(ApiModel):
     generation: Generation
     snapshot: CareerSnapshot
+
+
+class DraftView(ApiModel):
+    generation: Generation
+    draft: Draft
+    content_digest: str
 
 
 class JobView(ApiModel):

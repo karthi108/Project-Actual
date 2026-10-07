@@ -9,6 +9,7 @@ from fastapi import Request
 from sqlalchemy import Engine
 
 from actual.application.ports import CareerState
+from actual.application.preparation_service import PreparationService
 from actual.application.service import CareerService
 from actual.career.events import WorkEvent
 from actual.career.snapshot import CareerSnapshot
@@ -57,6 +58,16 @@ def runtime(request: Request) -> ApiRuntime:
 def career_service(request: Request) -> CareerService:
     configured = runtime(request)
     return CareerService(
+        StoreAdapter(CareerStore(configured.engine, configured.settings.workspace_id)),
+        configured.settings.workspace_id,
+        configured.settings.actor_id,
+        configured.clock,
+    )
+
+
+def preparation_service(request: Request) -> PreparationService:
+    configured = runtime(request)
+    return PreparationService(
         StoreAdapter(CareerStore(configured.engine, configured.settings.workspace_id)),
         configured.settings.workspace_id,
         configured.settings.actor_id,
