@@ -4,6 +4,8 @@ Accepted base: `bdc988ae7cc00379e6b90f1cf22e6c6de192be61`. Development branch: `
 
 Each phase has a separate WIP checkpoint. The implementation commit is located by its unique `wip(phase-N):` subject in `git log office/continuous-build`; later checkpoints record preceding hashes in the debt register. A commit cannot embed its own hash. No remote is configured, so checkpoints remain local until an authorized private remote exists.
 
+Post-handoff continuation strengthens existing synthetic capabilities in focused `wip(phase-N-followup):` checkpoints. The [Git inventory helper](../../scripts/office_git_state.py) records those separately from the original 21 phase commits. The [Phase-23 worker-termination campaign](../phase-23/README.md#follow-up-abrupt-worker-termination) is the first follow-up; canonical acceptance remains pending.
+
 | Phase | Implementation | Office checks | Canonical acceptance |
 | --- | --- | --- | --- |
 | 7 | Implemented; checkpoint `wip(phase-7): implement verified career profile` | Full dual-Python/real-PostgreSQL, typing/lint, integrity/replay and Qwen smoke passed | PENDING |

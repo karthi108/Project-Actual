@@ -11,3 +11,7 @@ The Phase-0 release contract and accepted phase records remain historical. The c
 Maintain [office checkpoints and validation debt](../office-build/README.md). Run available meaningful checks, preserve failures and record unavailable environment gates. Canonical acceptance is performed later on the personal laptop, phase by phase. No corporate restrictions may be bypassed. Push only an already configured private remote with existing permitted credentials; the repository currently has no configured remote.
 
 This approach preserves reviewable history and avoids misrepresenting office checks as acceptance. The cost is explicit validation debt and a second validation pass on the canonical environment. Optional infrastructure still requires a demonstrated need; the roadmap does not justify a generic framework in advance.
+
+## Continuation after the office handoff
+
+The renewed continuation instruction on 2026-10-08 permits focused follow-ups within the existing synthetic Phases 7–27 capabilities and their recorded validation debt. Keep the original 21 phase checkpoints unique; save further coherent work as `wip(phase-N-followup):` commits and include it in the Git inventory. Available crash/recovery checks can be strengthened on owned temporary resources. Personal-laptop acceptance, real accounts, deployment and unavailable integrations retain their gates.

@@ -21,6 +21,12 @@ def main() -> None:
             raise ValueError("Expected exactly one checkpoint per phase")
         row = matches[0]
         checkpoints.append({"phase": phase, "commit": row[:40], "subject": row[41:]})
+    phase_commits = {checkpoint["commit"] for checkpoint in checkpoints}
+    additional = [
+        {"commit": row[:40], "subject": row[41:]}
+        for row in reversed(records)
+        if row[:40] not in phase_commits
+    ]
     print(
         json.dumps(
             {
@@ -30,6 +36,7 @@ def main() -> None:
                 "working_tree_clean": not git("status", "--porcelain"),
                 "remote_names": git("remote").splitlines(),
                 "checkpoints": checkpoints,
+                "additional_checkpoints": additional,
                 "canonical_acceptance": "PENDING",
             },
             indent=2,

@@ -30,9 +30,9 @@ Branch: `office/continuous-build`. Accepted base: `bdc988ae7cc00379e6b90f1cf22e6
 | 24 | `9aec14929b00b086b108d0ac380e00a4b0f08304` |
 | 25 | `e910f9502237c8e5fdfc2fe17c5594724f4807c9` |
 | 26 | `b1a88715539e0affe80435e584f1050e9dec9663` |
-| 27 | Unique `wip(phase-27):` checkpoint containing this document; resolved in the post-commit inventory |
+| 27 | `cc572fda84cdcbacd8191f6cc940fb50bc81fc1c` |
 
-A tracked document cannot embed the hash of its own commit. After the Phase-27 checkpoint, `scripts/office_git_state.py` records the exact HEAD, all 21 full checkpoint hashes, branch, accepted base, working-tree state and remote names, without remote URLs or private content. The finalized local handoff at `local-data/office-build-handoff.md` includes that post-commit inventory plus this document; it is intentionally ignored, generated after the checkpoint. Regenerate the inventory after any later commit:
+A tracked document cannot embed the hash of its own commit. `scripts/office_git_state.py` records the exact HEAD, all 21 original full checkpoint hashes, additional follow-up commits, branch, accepted base, working-tree state and remote names, without remote URLs or private content. The historical Phase-27 local snapshot at `local-data/office-build-handoff.md` remains preserved. Later finalized snapshots use a commit-specific filename under `local-data`; they are intentionally ignored and generated after the relevant checkpoint. Regenerate the inventory after any later commit:
 
 ```powershell
 uv run --locked python scripts/office_git_state.py
@@ -69,7 +69,7 @@ Every row has canonical acceptance **PENDING**. Office checks refer to synthetic
 | 26 | Synthetic organizations/sessions/roles and shared exact review | Tenant/expiry/revocation/initiator/migration checks | No SSO/SCIM/teams UI; shared SQL role is not tenant isolation |
 | 27 | Enterprise ADRs/runbooks, bounded audit export and evaluator bootstrap | Audit snapshot/bootstrap and final checks below | Research readiness only; identity, scaling, DR and compliance evidence pending |
 
-## Final office checks
+## Phase-27 office checks
 
 Final results are recorded before checkpointing. No skipped PostgreSQL test is counted as a pass.
 
@@ -90,6 +90,12 @@ Final results are recorded before checkpointing. No skipped PostgreSQL test is c
 The initial full run failed before executing tests because the new database deployment test and accepted API deployment test had the same module basename. Only the newer module was renamed to `test_deployment_database.py`; test bodies and the original API test remain intact. The failed output is preserved in ignored `local-data/migration-tools/phase27-initial-collection-failure.log`. Initial helper import formatting was corrected. A broad formatter invocation also suggested changing an accepted Phase-5 documentation snippet; that file was preserved. CI now checks all Python source directories explicitly, while accepted evaluation artifacts are checked separately. No test or accepted contract was weakened.
 
 Final ignored evidence includes `regression-313.log`, `regression-314.log`, their JUnit XML and `native-postgres-checks.json` under `local-data/migration-tools`, two exclusive Phase-27 replay reports, and Playwright output under ignored frontend artifacts. Owned native database/browser harnesses clean up their own processes/clusters. These office harnesses and installed tool binaries are not prerequisites distributed by Git.
+
+## Post-handoff reliability follow-up
+
+The 2026-10-08 continuation adds eight owned worker-termination cases to existing Phase-23 reliability validation: lease recovery, rollback of uncommitted state/audit, pre-dispatch reservation, unknown dispatch, accepted-but-unacknowledged receipts and approval revocation at each effect boundary. It changes test coverage and Git inventory reporting; application runtime, migrations, models, dependencies and Career fixtures remain unchanged. See [the campaign](../phase-23/README.md#follow-up-abrupt-worker-termination) and [recorded follow-up debt](canonical-validation-pending.md#post-handoff-reliability-follow-up).
+
+The initial five crash cases passed on both supported Python versions (24.42/23.77 seconds). The expanded suite passed **140 related checks, including all eight termination/revocation cases, on each Python 3.13.13/3.14.4**, with real PostgreSQL 18.6 and zero skips; pytest reported 99.65/182.22 seconds. Ruff/formatting (201 Python files), strict typing of the changed inventory helper on both targets, unchanged CareerLab environment identity and the 46+2 frozen-artifact checks passed. All owned workers and the disposable cluster were cleaned up. Prior Phase-27 full-suite evidence above remains historical; no new full regression, frontend/browser or live model run is claimed here. The office harness uses separate `process-recovery-attempt-1-*` and `process-recovery-related-*` logs/XML/check summaries, preserving the previous full-suite outputs. All results remain canonical acceptance PENDING.
 
 ## Environment
 
