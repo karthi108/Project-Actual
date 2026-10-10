@@ -1,0 +1,95 @@
+# Private Linux synthetic rehearsal only. No public application listener.
+name: actual-synthetic-rehearsal
+services:
+  postgres:
+    image: postgres:18.6-bookworm
+    user: "999:999"
+    environment:
+      POSTGRES_USER: actual_migrator
+      POSTGRES_DB: actual_synthetic
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+    secrets: [postgres_password]
+    ports: ["127.0.0.1:55432:5432"]
+    volumes: [postgres_data:/var/lib/postgresql]
+    read_only: true
+    tmpfs: [/tmp, /var/run/postgresql]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 1g
+    cpus: 1.0
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U actual_migrator -d actual_synthetic"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+  api:
+    build: {context: .., dockerfile: deploy/Dockerfile.api}
+    # Preserves direct loopback peer, Host, Origin and fixed upstream restrictions.
+    network_mode: host
+    environment:
+      ACTUAL_API_MODE: synthetic-development
+      ACTUAL_API_WORKSPACE_ID: workspace_11111111111111111111111111111111
+      ACTUAL_API_ACTOR_ID: actor_11111111111111111111111111111111
+      ACTUAL_API_PORT: "8765"
+    secrets:
+      - {source: runtime_url, target: database_url}
+    depends_on: {postgres: {condition: service_healthy}}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 512m
+    cpus: 1.0
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request as u; u.build_opener(u.ProxyHandler({})).open('http://127.0.0.1:8765/health/ready', timeout=2).close()"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+  web:
+    build: {context: .., dockerfile: deploy/Dockerfile.web}
+    network_mode: host
+    depends_on: {api: {condition: service_healthy}}
+    read_only: true
+    tmpfs: [/tmp, /app/.next/cache]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 512m
+    cpus: 1.0
+  migrate:
+    profiles: [operator]
+    build: {context: .., dockerfile: deploy/Dockerfile.api}
+    network_mode: host
+    command: [python, -m, actual.deployment, migrate]
+    secrets:
+      - {source: migration_url, target: database_url}
+    depends_on: {postgres: {condition: service_healthy}}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 512m
+    cpus: 1.0
+  collector:
+    profiles: [telemetry]
+    image: otel/opentelemetry-collector:0.162.0
+    user: "10001:10001"
+    command: [--config=/etc/otelcol/config.yaml]
+    network_mode: host
+    volumes: [./otel-collector.yaml:/etc/otelcol/config.yaml:ro]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 32
+    mem_limit: 128m
+    cpus: 0.5
+secrets:
+  postgres_password: {file: ../local-data/deployment/postgres_password}
+  migration_url: {file: ../local-data/deployment/migration_url}
+  runtime_url: {file: ../local-data/deployment/runtime_url}
+volumes:
+  postgres_data:

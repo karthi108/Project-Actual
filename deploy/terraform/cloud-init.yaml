@@ -1,0 +1,6 @@
+#cloud-config
+ssh_pwauth: false
+disable_root: true
+package_update: false
+package_upgrade: false
+# No packages, credentials, private source or application deployment in cloud-init.

@@ -6,8 +6,10 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from actual.career.applications import Application
 from actual.career.jobs import Job
+from actual.career.materials import Draft
 from actual.career.snapshot import CareerSnapshot
 from actual.profile.contracts import Profile
+from actual.profile.projection import EvidenceBackedProfileView
 
 type Generation = Annotated[int, Field(strict=True, ge=1, le=9223372036854775807)]
 
@@ -22,6 +24,12 @@ class CareerView(ApiModel):
     snapshot: CareerSnapshot
 
 
+class DraftView(ApiModel):
+    generation: Generation
+    draft: Draft
+    content_digest: str
+
+
 class JobView(ApiModel):
     generation: Generation
     job: Job
@@ -30,6 +38,11 @@ class JobView(ApiModel):
 class ProfileView(ApiModel):
     generation: Generation
     profile: Profile
+
+
+class EvidenceProfileResponse(ApiModel):
+    generation: Generation
+    profile: EvidenceBackedProfileView
 
 
 class ApplicationView(ApiModel):

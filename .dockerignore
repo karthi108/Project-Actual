@@ -1,0 +1,27 @@
+# Allowlist the build context; private data, evaluator storage and Git cannot enter it.
+**
+!pyproject.toml
+!uv.lock
+!alembic.ini
+!src/
+!src/**
+!migrations/
+!migrations/**
+!deploy/
+!deploy/Dockerfile.*
+!apps/
+!apps/web/
+!apps/web/package.json
+!apps/web/pnpm-lock.yaml
+!apps/web/pnpm-workspace.yaml
+!apps/web/next.config.ts
+!apps/web/next-env.d.ts
+!apps/web/tsconfig.json
+!apps/web/postcss.config.mjs
+!apps/web/src/
+!apps/web/src/**
+**/__pycache__/
+**/*.pyc
+**/.env*
+**/*.pem
+**/*.key

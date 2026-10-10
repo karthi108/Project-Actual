@@ -1,0 +1,15 @@
+# ADR 0013 — Private deployment rehearsal preserves the accepted local boundary
+
+Date: 2026-10-07. Status: provisional office development, canonical validation pending.
+
+The accepted synthetic API deliberately authenticates nobody and accepts direct loopback clients, exact Host/origin values and a fixed frontend upstream. A public TLS proxy cannot turn those restrictions into authentication. Phase 25 therefore prepares a **private Linux rehearsal**, not a public product deployment. Phase 26's team harness will not silently broaden the Career API contract.
+
+Use separate non-root application containers with read-only roots, bounded resources, explicit mounted secret files and no Docker socket/source/data host mounts. API/web use Linux host networking so their existing loopback peer checks and fixed upstream still work. PostgreSQL uses a bridge with only loopback publishing and a separate runtime role. The host-network trade-off gives trusted application code access to host loopback services; it is unsuitable for untrusted execution and requires canonical host/firewall review. [Docker host-network requirements](https://docs.docker.com/engine/network/drivers/host/)
+
+Migrations remain an explicit operator command with a different credential. Startup never migrates. Files are per-service mounts, not secrets in an image or model. Local Compose mounts do not promise encryption at rest; the operator must protect host files and backups. [Compose secret behavior](https://docs.docker.com/compose/how-tos/use-secrets/)
+
+Opt-in transition instrumentation emits a small OTLP/HTTP JSON span through the existing HTTP library: bounded local collector destination, overall 250 ms export deadline, no retry, redirects/proxies disabled and no workflow inputs/outputs/prompts/credentials. A digest correlates a run; diagnostic IDs cannot authorize an action. Export failure is counted and cannot undo a committed step. Replay/shadow cannot export. This is a small protocol implementation, **not an OpenTelemetry SDK**, automatic HTTP/model/tool tracing or a reliable audit ledger. Collector interoperability remains unverified here. [OTLP wire format](https://opentelemetry.io/docs/specs/otlp/)
+
+OVH preparation uses the OpenStack provider, pinned at reviewed 3.4.0, with explicit enablement, operator-supplied identifiers, SSH-only narrow ingress and no deployment provisioner. Credentials/state are external. Cloud permissions, image/network compatibility, provider lock checksums and a plan remain personal-environment gates. [OVH provider mapping](https://docs.ovhcloud.com/en/guides/manage-and-operate/terraform/at-ovhcloud), [provider release](https://github.com/terraform-provider-openstack/terraform-provider-openstack/releases/tag/v3.4.0)
+
+TLS preparation is a certificate-backed loopback health probe that refuses every application path. Public remote access waits for a separately reviewed authenticated transport, identity, TLS/domain and privacy contract. No Kubernetes, Redis, vector store or paid model is justified by this rehearsal.

@@ -1,0 +1,13 @@
+# Preparation boundary
+
+Problem: a selected CV or supported source can coexist with unverified prose and contrary evidence. Copying its text would promote unreviewed assertions. Content review also needs a stable exact revision after restart.
+
+Simplest solution: reuse the accepted career aggregate/concurrency transaction and canonical profile/matcher. CV creation pins selected current claims. Comparison normalizes at most eight exact, human-selected job quotes deterministically and assesses the full profile, preserving conflict. CV coverage then checks the selected claim subset only for rows supported by that full assessment. No candidate/evaluator inputs enter extraction/model prompts; preparation makes zero model calls.
+
+Three controlled templates render positive supported structured units, never claim prose or CV summary. A skill retains its 0–3 unit; languages retain CEFR; generic month assertions explicitly retain unknown employment category and dates. No duration aggregation, activity-date inference, certification or employment invention. Current contrary evidence excludes the scope. Empty factual materials cannot receive an accepted review.
+
+An optional `actual-preparation-v1` context pins exact current job and CV revisions/digests. `None` is omitted by the supported Pydantic serializer, preserving legacy snapshot bytes. Existing payload storage accepts the extension without changing accepted migration `0001`. Every prepared snapshot revalidates template text and units, including unreviewed/rejected drafts. Legacy drafts retain historical semantics and cannot be newly reviewed by this service.
+
+Review validates the displayed revision and digest, then advances the record revision with its exact content review and atomic `draft_reviewed` event, as required by the accepted store. The event preserves source references, server actor/time and reviewed-object digest. Revision creates the next revision and clears review. Historical events retain their historical reference catalog. Existing source dependency guards reject edits/reviews/withdrawal while CV/draft references depend on them; explicit reconciliation remains future work.
+
+Trade-offs: templates are intentionally sparse; arbitrary polished wording requires semantic review before it could be supported. Human-selected requirements are labelled as source selections rather than independently reviewed employer truth. Coverage uses essential/preferred counts, keeps ties and abstains when nothing is covered. Comparison is transient and generation bound. The UI currently selects one quote per comparison; the API supports up to eight. No document import/export or external account is added.

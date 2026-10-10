@@ -8,6 +8,7 @@ from actual.core.primitives import (
     Classification,
     Contract,
     Instant,
+    JobId,
     WorkspaceId,
     classification_allows,
 )
@@ -88,6 +89,16 @@ class CareerSnapshot(Contract):
         for draft in self.drafts:
             if draft.profile_id != self.profile.id:
                 raise ValueError("Draft belongs to another profile")
+            if draft.preparation is not None:
+                from actual.preparation.render import validate_material
+
+                source_job = jobs.get(JobId(draft.preparation.job.object_id.root))
+                source_cv = next(
+                    (item for item in self.cvs if item.id == draft.preparation.cv.object_id), None
+                )
+                if source_job is None or source_cv is None:
+                    raise ValueError("Missing preparation source")
+                validate_material(draft, source_job, source_cv, self.profile)
             for proposal in draft.assertions:
                 for reference in proposal.source_claim_refs:
                     check_claim(reference)

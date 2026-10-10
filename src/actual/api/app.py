@@ -21,11 +21,24 @@ from actual.application.commands import (
 )
 from actual.application.errors import UseCaseCode, UseCaseError
 from actual.application.ports import CareerState
+from actual.application.preparation_commands import (
+    CompareCVs,
+    CreateCV,
+    PrepareDraft,
+    ReviewDraft,
+    ReviseDraft,
+)
+from actual.application.preparation_service import PreparationService
+from actual.application.profile_commands import (
+    ReviewSyntheticClaim,
+    ReviewSyntheticEvidence,
+    WithdrawEvidence,
+)
 from actual.application.service import CareerService
 from actual.career.applications import Application
 from actual.career.events import WorkEvent
 from actual.career.jobs import Job
-from actual.core.primitives import ApplicationId, JobId
+from actual.core.primitives import ApplicationId, ClaimId, DraftId, EvidenceId, JobId
 from actual.persistence.database import create_database_engine, verify_schema
 from actual.persistence.errors import (
     ConflictError,
@@ -36,12 +49,15 @@ from actual.persistence.errors import (
     SchemaMismatchError,
 )
 from actual.persistence.repository import CareerStore
+from actual.preparation.comparison import CVComparison
 
 from .config import ApiSettings
 from .contracts import (
     ApplicationView,
     CareerView,
+    DraftView,
     ErrorResponse,
+    EvidenceProfileResponse,
     Health,
     JobView,
     Page,
@@ -49,13 +65,23 @@ from .contracts import (
     StatePage,
 )
 from .transport import LocalBoundary, error_response
-from .wiring import ApiRuntime, career_service, runtime
+from .wiring import ApiRuntime, career_service, preparation_service, runtime
 
 type Service = Annotated[CareerService, Depends(career_service)]
+type Preparation = Annotated[PreparationService, Depends(preparation_service)]
 type Offset = Annotated[int, Query(ge=0, le=1_000_000)]
 type Limit = Annotated[int, Query(ge=1, le=100)]
 type JobPath = Annotated[str, Path(pattern=r"^job_[0-9a-f]{32}$")]
 type ApplicationPath = Annotated[str, Path(pattern=r"^application_[0-9a-f]{32}$")]
+type EvidencePath = Annotated[str, Path(pattern=r"^evidence_[0-9a-f]{32}$")]
+type ClaimPath = Annotated[str, Path(pattern=r"^claim_[0-9a-f]{32}$")]
+type DraftPath = Annotated[str, Path(pattern=r"^draft_[0-9a-f]{32}$")]
+
+
+def _draft_view(state: CareerState, identifier: DraftId) -> DraftView:
+    draft = next(item for item in state.snapshot.drafts if item.id == identifier)
+    return DraftView(generation=state.generation, draft=draft, content_digest=draft.content_digest)
+
 
 _ERRORS: dict[UseCaseCode, tuple[int, str]] = {
     UseCaseCode.RESOURCE_NOT_FOUND: (404, "The requested resource is absent."),
@@ -110,8 +136,9 @@ def create_app(
         version="1.0.0",
         description=(
             "Isolated local synthetic development only. No authentication or real-data access. "
-            "All mutations require the current aggregate generation; review/verification and "
-            "external submission are not API operations."
+            "All mutations require the current aggregate generation. Synthetic source and claim "
+            "reviews are separate operations; independent verification and external submission "
+            "are not API operations."
         ),
         lifespan=lifespan,
         docs_url=None,
@@ -258,6 +285,48 @@ def create_app(
         state = service.attach_evidence(command)
         return ProfileView(generation=state.generation, profile=state.snapshot.profile)
 
+    @router.get("/profile/evidence", response_model=EvidenceProfileResponse, tags=["profile"])
+    def evidence_profile(service: Service) -> EvidenceProfileResponse:
+        """Read current declarations, source reviews, support and conflicts separately."""
+        state, view = service.evidence_profile()
+        return EvidenceProfileResponse(generation=state.generation, profile=view)
+
+    @router.post(
+        "/profile/evidence/{evidence_id}/synthetic-review",
+        response_model=ProfileView,
+        tags=["profile"],
+    )
+    def review_evidence(
+        evidence_id: EvidencePath, command: ReviewSyntheticEvidence, service: Service
+    ) -> ProfileView:
+        """Review an exact synthetic fixture source; this does not accept its claims."""
+        state = service.review_synthetic_evidence(EvidenceId(evidence_id), command)
+        return ProfileView(generation=state.generation, profile=state.snapshot.profile)
+
+    @router.post(
+        "/profile/claims/{claim_id}/synthetic-review",
+        response_model=ProfileView,
+        tags=["profile"],
+    )
+    def review_claim(
+        claim_id: ClaimPath, command: ReviewSyntheticClaim, service: Service
+    ) -> ProfileView:
+        """Accept a pinned claim only against sufficient current reviewed synthetic support."""
+        state = service.review_synthetic_claim(ClaimId(claim_id), command)
+        return ProfileView(generation=state.generation, profile=state.snapshot.profile)
+
+    @router.post(
+        "/profile/evidence/{evidence_id}/withdraw",
+        response_model=ProfileView,
+        tags=["profile"],
+    )
+    def withdraw_evidence(
+        evidence_id: EvidencePath, command: WithdrawEvidence, service: Service
+    ) -> ProfileView:
+        """Retain a withdrawn source and atomically invalidate dependent claim support."""
+        state = service.withdraw_evidence(EvidenceId(evidence_id), command)
+        return ProfileView(generation=state.generation, profile=state.snapshot.profile)
+
     @router.post(
         "/applications", response_model=ApplicationView, status_code=201, tags=["applications"]
     )
@@ -309,6 +378,37 @@ def create_app(
         return Page[WorkEvent](
             items=items, offset=offset, limit=limit, total=len(records), next_offset=following
         )
+
+    @router.post("/cvs", response_model=CareerView, status_code=201, tags=["preparation"])
+    def create_cv(command: CreateCV, service: Preparation) -> CareerView:
+        state = service.create_cv(command)
+        return CareerView(generation=state.generation, snapshot=state.snapshot)
+
+    @router.post("/cvs/compare", response_model=CVComparison, tags=["preparation"])
+    def compare_cvs(command: CompareCVs, service: Preparation) -> CVComparison:
+        return service.compare_cvs(command)
+
+    @router.post("/drafts", response_model=DraftView, status_code=201, tags=["preparation"])
+    def prepare(command: PrepareDraft, service: Preparation) -> DraftView:
+        return _draft_view(service.prepare(command), command.id)
+
+    @router.post("/drafts/{draft_id}/revise", response_model=DraftView, tags=["preparation"])
+    def revise(draft_id: DraftPath, command: ReviseDraft, service: Preparation) -> DraftView:
+        identifier = DraftId(draft_id)
+        return _draft_view(service.revise(identifier, command), identifier)
+
+    @router.post("/drafts/{draft_id}/review", response_model=DraftView, tags=["preparation"])
+    def review(draft_id: DraftPath, command: ReviewDraft, service: Preparation) -> DraftView:
+        identifier = DraftId(draft_id)
+        return _draft_view(service.review(identifier, command), identifier)
+
+    @router.get("/drafts/{draft_id}", response_model=DraftView, tags=["preparation"])
+    def draft(draft_id: DraftPath, service: Preparation) -> DraftView:
+        identifier = DraftId(draft_id)
+        state = service.get_state()
+        if not any(item.id == identifier for item in state.snapshot.drafts):
+            raise UseCaseError(UseCaseCode.RESOURCE_NOT_FOUND)
+        return _draft_view(state, identifier)
 
     app.include_router(router)
     return app

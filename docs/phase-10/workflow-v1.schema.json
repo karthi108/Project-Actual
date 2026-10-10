@@ -1,0 +1,415 @@
+{
+  "$defs": {
+    "Binding": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "actual-core-v1",
+          "default": "actual-core-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/$defs/Name"
+        },
+        "source": {
+          "enum": [
+            "literal",
+            "trigger",
+            "output"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Scalar"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "step": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Name"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "field": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Name"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "name",
+        "source"
+      ],
+      "title": "Binding",
+      "type": "object"
+    },
+    "Edge": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "actual-core-v1",
+          "default": "actual-core-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/Name"
+        },
+        "outcome": {
+          "enum": [
+            "success",
+            "error",
+            "true",
+            "false",
+            "allow",
+            "deny",
+            "approved",
+            "denied",
+            "timeout"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/Name"
+        }
+      },
+      "required": [
+        "source",
+        "outcome",
+        "target"
+      ],
+      "title": "Edge",
+      "type": "object"
+    },
+    "EffectKind": {
+      "enum": [
+        "READ_ONLY",
+        "LOCAL_WRITE",
+        "EXTERNAL_WRITE"
+      ],
+      "type": "string"
+    },
+    "Kind": {
+      "enum": [
+        "trigger",
+        "deterministic",
+        "ai",
+        "tool",
+        "policy",
+        "human_approval",
+        "branch",
+        "wait",
+        "terminate"
+      ],
+      "type": "string"
+    },
+    "Name": {
+      "pattern": "^[a-z][a-z0-9_]{0,47}$",
+      "type": "string"
+    },
+    "Retry": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "actual-core-v1",
+          "default": "actual-core-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "attempts": {
+          "default": 1,
+          "maximum": 5,
+          "minimum": 1,
+          "title": "Attempts",
+          "type": "integer"
+        },
+        "backoff_seconds": {
+          "default": 1,
+          "maximum": 300,
+          "minimum": 1,
+          "title": "Backoff Seconds",
+          "type": "integer"
+        }
+      },
+      "title": "Retry",
+      "type": "object"
+    },
+    "Scalar": {
+      "anyOf": [
+        {
+          "maxLength": 4096,
+          "type": "string"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        }
+      ]
+    },
+    "Slot": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "actual-core-v1",
+          "default": "actual-core-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/$defs/Name"
+        },
+        "type": {
+          "$ref": "#/$defs/ValueType"
+        }
+      },
+      "required": [
+        "name",
+        "type"
+      ],
+      "title": "Slot",
+      "type": "object"
+    },
+    "Step": {
+      "additionalProperties": false,
+      "properties": {
+        "schema_version": {
+          "const": "actual-core-v1",
+          "default": "actual-core-v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "id": {
+          "$ref": "#/$defs/Name"
+        },
+        "kind": {
+          "$ref": "#/$defs/Kind"
+        },
+        "capability": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Name"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "inputs": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Binding"
+          },
+          "maxItems": 8,
+          "title": "Inputs",
+          "type": "array"
+        },
+        "effect": {
+          "$ref": "#/$defs/EffectKind",
+          "default": "READ_ONLY"
+        },
+        "permissions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Name"
+          },
+          "maxItems": 8,
+          "title": "Permissions",
+          "type": "array"
+        },
+        "human_review": {
+          "default": false,
+          "title": "Human Review",
+          "type": "boolean"
+        },
+        "idempotency": {
+          "default": "pure",
+          "enum": [
+            "pure",
+            "provider_key",
+            "reconcile"
+          ],
+          "title": "Idempotency",
+          "type": "string"
+        },
+        "timeout_seconds": {
+          "default": 30,
+          "maximum": 300,
+          "minimum": 1,
+          "title": "Timeout Seconds",
+          "type": "integer"
+        },
+        "retry": {
+          "$ref": "#/$defs/Retry",
+          "default": {
+            "schema_version": "actual-core-v1",
+            "attempts": 1,
+            "backoff_seconds": 1
+          }
+        },
+        "failure": {
+          "const": "route_error",
+          "default": "route_error",
+          "title": "Failure",
+          "type": "string"
+        },
+        "classification": {
+          "const": "synthetic",
+          "default": "synthetic",
+          "title": "Classification",
+          "type": "string"
+        },
+        "protects": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Name"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "wait_seconds": {
+          "default": 1,
+          "maximum": 86400,
+          "minimum": 1,
+          "title": "Wait Seconds",
+          "type": "integer"
+        },
+        "terminal": {
+          "default": "succeeded",
+          "enum": [
+            "succeeded",
+            "failed",
+            "cancelled"
+          ],
+          "title": "Terminal",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "kind"
+      ],
+      "title": "Step",
+      "type": "object"
+    },
+    "ValueType": {
+      "enum": [
+        "text",
+        "boolean",
+        "integer"
+      ],
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "actual-core-v1",
+      "default": "actual-core-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "ir_version": {
+      "const": "actual-workflow-v1",
+      "default": "actual-workflow-v1",
+      "title": "Ir Version",
+      "type": "string"
+    },
+    "id": {
+      "$ref": "#/$defs/Name"
+    },
+    "version": {
+      "maximum": 1000000,
+      "minimum": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "classification": {
+      "const": "synthetic",
+      "default": "synthetic",
+      "title": "Classification",
+      "type": "string"
+    },
+    "trigger_schema": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Slot"
+      },
+      "maxItems": 8,
+      "title": "Trigger Schema",
+      "type": "array"
+    },
+    "steps": {
+      "items": {
+        "$ref": "#/$defs/Step"
+      },
+      "maxItems": 64,
+      "minItems": 2,
+      "title": "Steps",
+      "type": "array"
+    },
+    "edges": {
+      "items": {
+        "$ref": "#/$defs/Edge"
+      },
+      "maxItems": 192,
+      "minItems": 1,
+      "title": "Edges",
+      "type": "array"
+    },
+    "max_steps": {
+      "default": 64,
+      "maximum": 320,
+      "minimum": 2,
+      "title": "Max Steps",
+      "type": "integer"
+    },
+    "max_model_calls": {
+      "default": 0,
+      "maximum": 16,
+      "minimum": 0,
+      "title": "Max Model Calls",
+      "type": "integer"
+    },
+    "max_duration_seconds": {
+      "default": 900,
+      "maximum": 86400,
+      "minimum": 1,
+      "title": "Max Duration Seconds",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "id",
+    "version",
+    "steps",
+    "edges"
+  ],
+  "title": "Workflow",
+  "type": "object"
+}

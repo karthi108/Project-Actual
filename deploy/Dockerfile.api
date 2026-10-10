@@ -1,0 +1,16 @@
+FROM python:3.13.13-slim-bookworm AS build
+WORKDIR /app
+RUN python -m pip install --no-cache-dir uv==0.11.7
+COPY pyproject.toml uv.lock ./
+COPY src ./src
+RUN uv sync --locked --no-dev --no-editable --python /usr/local/bin/python
+
+FROM python:3.13.13-slim-bookworm
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PATH=/app/.venv/bin:$PATH
+WORKDIR /app
+RUN useradd --uid 10001 --no-create-home actual
+COPY --from=build /app/.venv /app/.venv
+COPY alembic.ini ./
+COPY migrations ./migrations
+USER 10001:10001
+CMD ["python", "-m", "actual.deployment", "serve"]
